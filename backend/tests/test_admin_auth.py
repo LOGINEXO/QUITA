@@ -1,9 +1,4 @@
-import os
-
 from fastapi.testclient import TestClient
-
-# The API creates its provider store at import time; SQLite keeps auth tests self-contained.
-os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
 
 from app.api.providers import require_admin
 from app.config import settings
