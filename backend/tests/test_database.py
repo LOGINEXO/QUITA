@@ -5,9 +5,10 @@ from app.db.models import ApiProvider, Base, Customer, Lead, VehicleConsultation
 from app.db.session import normalize_database_url
 
 
-def test_normalizes_legacy_postgres_scheme() -> None:
-    assert normalize_database_url("postgres://u:p@host/db") == "postgresql://u:p@host/db"
-    assert normalize_database_url("postgresql://u:p@host/db") == "postgresql://u:p@host/db"
+def test_normalizes_render_postgres_scheme_for_psycopg3() -> None:
+    assert normalize_database_url("postgres://u:p@host/db") == "postgresql+psycopg://u:p@host/db"
+    assert normalize_database_url("postgresql://u:p@host/db") == "postgresql+psycopg://u:p@host/db"
+    assert normalize_database_url("sqlite:///:memory:") == "sqlite:///:memory:"
 
 
 def test_schema_creates_core_tables_and_indexes() -> None:
@@ -39,7 +40,7 @@ def test_customer_lead_consultation_relationships() -> None:
         assert consultation.lead.customer.full_name == "Cliente de teste"
 
 
-def test_provider_schema_never_requires_plaintext_api_key() -> None:
+def test_provider_schema_references_secret_instead_of_storing_plaintext() -> None:
     engine = create_engine("sqlite+pysqlite:///:memory:")
     Base.metadata.create_all(engine)
     with Session(engine) as session:
