@@ -9,9 +9,11 @@ from sqlalchemy.orm import Session, sessionmaker
 
 
 def normalize_database_url(url: str) -> str:
-    """Normalize URLs commonly supplied by managed PostgreSQL providers."""
+    """Normalize Render/legacy PostgreSQL URLs to the installed psycopg 3 driver."""
     if url.startswith("postgres://"):
-        return "postgresql://" + url.removeprefix("postgres://")
+        url = "postgresql://" + url.removeprefix("postgres://")
+    if url.startswith("postgresql://"):
+        url = "postgresql+psycopg://" + url.removeprefix("postgresql://")
     return url
 
 
