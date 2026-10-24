@@ -2,7 +2,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    admin_api_key: str = ""
     admin_email: str = "usernovapagina@gmail.com"
     admin_password: str = ""
     admin_cookie_secure: bool = True
