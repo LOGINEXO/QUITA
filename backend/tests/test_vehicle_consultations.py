@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+import pytest
 
 from app.api import vehicle_consultations as vehicle_api
 from app.config import settings
@@ -30,14 +31,19 @@ def override_get_db():
 client = TestClient(app)
 
 
-def setup_function():
+@pytest.fixture(autouse=True)
+def isolate_test_dependencies(monkeypatch):
+    previous = app.dependency_overrides.get(get_db)
     app.dependency_overrides[get_db] = override_get_db
+    monkeypatch.setattr(settings, "admin_api_key", "test-admin-key")
+    monkeypatch.setattr(settings, "admin_token_secret", "test-secret-that-is-at-least-32-characters-long")
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-
-
-def teardown_function():
-    app.dependency_overrides.pop(get_db, None)
+    yield
+    if previous is None:
+        app.dependency_overrides.pop(get_db, None)
+    else:
+        app.dependency_overrides[get_db] = previous
 
 
 def test_vehicle_consultation_persists_success(monkeypatch):
@@ -75,10 +81,6 @@ def test_vehicle_consultation_rejects_invalid_plate_without_provider_call(monkey
     assert response.status_code == 422
 
 
-def test_admin_vehicle_consultation_list_requires_authentication(monkeypatch):
-    monkeypatch.setattr(settings, "admin_email", "admin@example.com")
-    monkeypatch.setattr(settings, "admin_password", "a-long-test-password")
-    monkeypatch.setattr(settings, "admin_token_secret", "test-secret-that-is-at-least-32-characters-long")
-    monkeypatch.setattr(settings, "admin_token_ttl_minutes", 30)
-    response = client.get("/admin/consultations/vehicle")
+def test_admin_vehicle_consultation_list_requires_authentication():
+    response = client.get("/admin/consultations/vehicle", headers={"X-Admin-Api-Key": "wrong-key"})
     assert response.status_code == 401
