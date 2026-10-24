@@ -47,7 +47,7 @@ Documentação de referência: https://buscafipe.com/api-docs/
 
 A documentação informa 100 consultas/dia sem autenticação para FIPE/IPVA. Ela lista CNPJ como gratuito, mas também descreve acesso de parceiro com chave para todos os endpoints; confirme com o fornecedor a disponibilidade do endpoint de CNPJ por API e o mecanismo de autenticação. A consulta por placa aparece como premium/parceiro. O código não inventa um formato de chave que a documentação não descreva. Respostas HTTP 429 e falhas de rede são expostas como indisponibilidade, não como ausência de débitos.
 
-Antes de expor os endpoints públicos sem restrições, implemente rate limiting e controles antiabuso. Consultas por placa podem envolver dados pessoais; limite o acesso administrativo e evite armazenar ou exibir dados além do necessário.
+Os endpoints públicos agora aplicam limites por IP e janela móvel: login administrativo (5/min), criação de lead (10/min), consulta por placa (5/min) e endpoints públicos BuscaFIPE de placa/CNPJ (5/min). Excesso retorna HTTP 429 e `Retry-After`. O limitador atual é em memória por processo; se o serviço escalar para múltiplas instâncias, migre o contador para um armazenamento compartilhado (por exemplo, Redis) para manter o limite global. Consultas por placa podem envolver dados pessoais; o log de auditoria evita registrar a placa ou os dados de contato.
 
 ## Desenvolvimento local
 
