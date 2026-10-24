@@ -8,8 +8,33 @@ on:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 3
     steps:
+      - name: Verify production Redis connectivity
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.error
+          import urllib.request
+
+          url = "https://quita-api.onrender.com/health/rate-limit"
+          request = urllib.request.Request(url, method="GET")
+          try:
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  status = response.status
+                  payload = json.loads(response.read())
+          except urllib.error.HTTPError as error:
+              payload = error.read().decode(errors="replace")
+              raise SystemExit(f"Redis health check returned HTTP {error.code}: {payload}")
+          except Exception as error:
+              raise SystemExit(f"Redis health check transport failure: {type(error).__name__}: {error}")
+
+          print(json.dumps(payload, sort_keys=True))
+          if status != 200 or payload.get("backend") != "redis" or payload.get("redis_reachable") is not True:
+              raise SystemExit("FAIL: production rate limiter is not confirmed to be using reachable Redis.")
+          print("PASS: production Redis is configured and reachable.")
+          PY
+
       - name: Probe production admin login rate limit
         env:
           TARGET_URL: https://quita-api.onrender.com/auth/admin/login
