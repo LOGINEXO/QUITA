@@ -52,3 +52,16 @@ pytest
 ## Segurança
 
 Nunca commite chaves reais. Use variáveis de ambiente/secret manager em produção, TLS quando aplicável, autenticação e autorização para endpoints administrativos. O endpoint de gestão de provedores continua usando uma chave administrativa simples como proteção inicial; isso não substitui autenticação completa de usuários, funções, auditoria e armazenamento seguro.
+
+## Login administrativo
+
+O login administrativo usa o e-mail configurado em `QUITA_ADMIN_EMAIL` e a senha guardada somente no ambiente do servidor.
+
+Configure em **Render → quita-api → Environment**:
+
+- `QUITA_ADMIN_EMAIL`: `usernovapagina@gmail.com`
+- `QUITA_ADMIN_PASSWORD`: crie uma senha exclusiva com pelo menos 12 caracteres.
+- `QUITA_ADMIN_TOKEN_SECRET`: segredo aleatório com pelo menos 32 caracteres.
+- `QUITA_ADMIN_TOKEN_TTL_MINUTES`: `30` (opcional; padrão de 30 minutos).
+
+Não coloque a senha nem o segredo no GitHub ou em mensagens. Após o deploy, faça login com `POST /auth/admin/login`, enviando JSON com `email` e `password`. A resposta contém `access_token`; envie-o como `Authorization: Bearer <access_token>`. `GET /auth/admin/me` valida o token. O token expira após o período configurado. A chave administrativa existente `X-Admin-Api-Key` continua aceita nas rotas de provedores.
