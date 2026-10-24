@@ -1,0 +1,63 @@
+name: Production Redis rate-limit probe
+
+on:
+  push:
+    branches:
+      - test/redis-rate-limit-production-path
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Probe production admin login rate limit
+        env:
+          TARGET_URL: https://quita-api.onrender.com/auth/admin/login
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.error
+          import urllib.request
+
+          url = os.environ["TARGET_URL"]
+          statuses = []
+          retry_after = None
+          for index in range(6):
+              body = json.dumps({
+                  "email": "rate-limit-probe-invalid@example.invalid",
+                  "password": "invalid-probe-password"
+              }).encode()
+              request = urllib.request.Request(
+                  url,
+                  data=body,
+                  headers={"Content-Type": "application/json"},
+                  method="POST",
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=15) as response:
+                      status = response.status
+                      headers = response.headers
+              except urllib.error.HTTPError as error:
+                  status = error.code
+                  headers = error.headers
+                  error.read()
+              except Exception as error:
+                  raise SystemExit(f"Request {index + 1} failed at transport level: {type(error).__name__}: {error}")
+              statuses.append(status)
+              if index == 5:
+                  retry_after = headers.get("Retry-After")
+              print(f"request_{index + 1}_status={status}")
+              time.sleep(0.25)
+
+          print(f"statuses={statuses}")
+          print(f"sixth_retry_after={retry_after}")
+          if statuses[5] != 429:
+              raise SystemExit(
+                  "FAIL: sixth request did not return HTTP 429; inspect Render app logs and Redis connectivity."
+              )
+          if not retry_after:
+              raise SystemExit("FAIL: HTTP 429 response did not include Retry-After.")
+          print("PASS: production rate limiter returned 429 on request six with Retry-After.")
+          PY
