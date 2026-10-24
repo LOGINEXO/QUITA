@@ -15,9 +15,17 @@ O repositório inclui um Blueprint em `render.yaml` para criar o serviço FastAP
 
 **Importante:** o Blueprint usa planos `free` para facilitar a primeira validação. Antes de produção, confirme as limitações, a retenção/expiração do banco gratuito e os requisitos de disponibilidade no Render; escolha um plano pago se precisar de persistência e operação de produção garantidas. Serviço e banco devem ficar na mesma região. O banco está configurado para aceitar apenas conexões internas (`ipAllowList: []`).
 
-## Persistência inicial
+## Persistência e provedores de API
 
-A primeira migration cria as tabelas para clientes, leads, consultas veiculares, configuração de provedores e auditoria. O esquema não armazena chaves de API em texto puro: `api_providers.secret_ref` é uma referência a um segredo configurado fora do banco. O gerenciador de provedores existente ainda precisa ser conectado a essa persistência na próxima etapa.
+A migration inicial cria as tabelas para clientes, leads, consultas veiculares, provedores de API e auditoria. O gerenciamento de provedores usa PostgreSQL para criar, listar, atualizar e remover configurações. Chaves de API não são armazenadas em texto puro: `api_providers.secret_ref` guarda somente uma referência à variável de ambiente.
+
+Para configurar a chave de um provedor, defina no ambiente do serviço Render a variável correspondente ao ID do provedor, seguindo o padrão `QUITA_PROVIDER_<ID>_API_KEY` (o ID é convertido para maiúsculas e caracteres não alfanuméricos viram sublinhados).
+
+## Captação e gestão de leads
+
+- `POST /leads`: recebe nome, e-mail e/ou telefone, código postal opcional, origem e consentimento de privacidade. Requer pelo menos um meio de contato e consentimento explícito. Cria o cliente e o lead no PostgreSQL.
+- `GET /admin/leads`: lista leads para uso administrativo. Aceita `status`, `limit` (1–200) e `offset`. Requer autenticação administrativa.
+- `PATCH /admin/leads/{lead_id}`: atualiza o status (`new`, `contacted`, `qualified`, `converted`, `closed`) e opcionalmente as notas. Requer autenticação administrativa.
 
 ## Integração BuscaFIPE
 
@@ -40,7 +48,7 @@ Requer Python 3.11+ e PostgreSQL se quiser testar uma conexão real.
 
 ```bash
 python -m venv .venv
-# Windows: .venv\Scripts\activate
+# Windows: .venv\\Scripts\\activate
 # Linux/macOS: source .venv/bin/activate
 pip install -e ".[dev]"
 # Defina DATABASE_URL antes de executar migrations
@@ -51,7 +59,7 @@ pytest
 
 ## Segurança
 
-Nunca commite chaves reais. Use variáveis de ambiente/secret manager em produção, TLS quando aplicável, autenticação e autorização para endpoints administrativos. O endpoint de gestão de provedores continua usando uma chave administrativa simples como proteção inicial; isso não substitui autenticação completa de usuários, funções, auditoria e armazenamento seguro.
+Nunca commite chaves reais. Use variáveis de ambiente/secret manager em produção e TLS quando aplicável. Endpoints administrativos exigem autenticação; mantenha segredos fora do GitHub e evite registrar dados pessoais desnecessários.
 
 ## Login administrativo
 
@@ -59,9 +67,9 @@ O login administrativo usa o e-mail configurado em `QUITA_ADMIN_EMAIL` e a senha
 
 Configure em **Render → quita-api → Environment**:
 
-- `QUITA_ADMIN_EMAIL`: `usernovapagina@gmail.com`
-- `QUITA_ADMIN_PASSWORD`: crie uma senha exclusiva com pelo menos 12 caracteres.
+- `QUITA_ADMIN_EMAIL`: e-mail do administrador.
+- `QUITA_ADMIN_PASSWORD`: senha exclusiva com pelo menos 12 caracteres.
 - `QUITA_ADMIN_TOKEN_SECRET`: segredo aleatório com pelo menos 32 caracteres.
 - `QUITA_ADMIN_TOKEN_TTL_MINUTES`: `30` (opcional; padrão de 30 minutos).
 
-Não coloque a senha nem o segredo no GitHub ou em mensagens. Após o deploy, faça login com `POST /auth/admin/login`, enviando JSON com `email` e `password`. A resposta contém `access_token`; envie-o como `Authorization: Bearer <access_token>`. `GET /auth/admin/me` valida o token. O token expira após o período configurado. A chave administrativa existente `X-Admin-Api-Key` continua aceita nas rotas de provedores.
+Não coloque a senha nem o segredo no GitHub ou em mensagens. Após o deploy, faça login com `POST /auth/admin/login`, enviando JSON com `email` e `password`. A resposta contém `access_token`; envie-o como `Authorization: Bearer <access_token>`. `GET /auth/admin/me` valida o token. A chave administrativa existente `X-Admin-Api-Key` continua aceita nas rotas de provedores.
