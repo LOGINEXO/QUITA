@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - test/redis-rate-limit-production-path
+      - test/admin-cookie-session-production
 
 jobs:
   probe:
@@ -78,6 +79,11 @@ jobs:
 
           print(f"statuses={statuses}")
           print(f"sixth_retry_after={retry_after}")
+          if statuses[:5] != [401, 401, 401, 401, 401]:
+              raise SystemExit(
+                  "FAIL: admin login did not reject invalid credentials with HTTP 401 on the first five requests; "
+                  "HTTP 503 indicates missing admin password configuration."
+              )
           if statuses[5] != 429:
               raise SystemExit(
                   "FAIL: sixth request did not return HTTP 429; inspect Render app logs and Redis connectivity."
