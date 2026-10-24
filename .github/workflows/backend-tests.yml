@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -25,3 +29,5 @@ jobs:
         run: pytest -q
       - name: Compile Python
         run: python -m compileall -q backend
+      - name: Validate Alembic migration graph
+        run: alembic history
