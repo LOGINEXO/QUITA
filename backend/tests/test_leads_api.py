@@ -26,7 +26,6 @@ def override_get_db():
         session.close()
 
 
-app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
@@ -38,8 +37,13 @@ def configure_admin(monkeypatch):
 
 
 def setup_function():
+    app.dependency_overrides[get_db] = override_get_db
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
+
+
+def teardown_function():
+    app.dependency_overrides.pop(get_db, None)
 
 
 def test_public_lead_capture_normalizes_contact_data():
