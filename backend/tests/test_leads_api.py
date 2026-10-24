@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.api.providers import require_admin
 from app.config import settings
 from app.db.models import Base
 from app.db.session import get_db
@@ -32,18 +31,29 @@ client = TestClient(app)
 def configure_admin(monkeypatch):
     monkeypatch.setattr(settings, "admin_email", "admin@example.com")
     monkeypatch.setattr(settings, "admin_password", "a-long-test-password")
-    monkeypatch.setattr(settings, "admin_token_secret", "test-secret-that-is-at-least-32-characters-long")
-    monkeypatch.setattr(settings, "admin_token_ttl_minutes", 30)
+    monkeypatch.setattr(settings, "admin_cookie_secure", False)
+
+    async def create_session(email):
+        assert email == "admin@example.com"
+        return "test-admin-session"
+
+    async def get_session(session_id):
+        return "admin@example.com" if session_id == "test-admin-session" else None
+
+    monkeypatch.setattr("app.api.admin_auth.create_admin_session", create_session)
+    monkeypatch.setattr("app.api.admin_auth.get_admin_session_email", get_session)
 
 
 def setup_function():
     app.dependency_overrides[get_db] = override_get_db
+    client.cookies.clear()
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
 
 def teardown_function():
     app.dependency_overrides.pop(get_db, None)
+    client.cookies.clear()
 
 
 def test_public_lead_capture_normalizes_contact_data():
@@ -93,16 +103,17 @@ def test_admin_can_list_filter_and_update_leads(monkeypatch):
         "/auth/admin/login",
         json={"email": "admin@example.com", "password": "a-long-test-password"},
     )
-    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    assert login.status_code == 200
+    assert "access_token" not in login.json()
+    assert client.cookies.get("quita_admin_session") == "test-admin-session"
 
-    listed = client.get("/admin/leads?status=new", headers=headers)
+    listed = client.get("/admin/leads?status=new")
     assert listed.status_code == 200
     assert len(listed.json()) == 1
     assert listed.json()[0]["customer_name"] == "João Souza"
 
     updated = client.patch(
         f"/admin/leads/{lead_id}",
-        headers=headers,
         json={"status": "contacted", "notes": "Contato inicial realizado"},
     )
     assert updated.status_code == 200

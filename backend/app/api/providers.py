@@ -1,38 +1,12 @@
-import hmac
-
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, model_validator
 
-from app.api.admin_auth import verify_admin_token
-from app.config import settings
+from app.api.admin_auth import require_admin_session
 from app.providers.models import ProviderCapability, ProviderConfig, ProviderPublicView
 from app.providers.persistence import PersistentProviderStore, secret_environment_name
 
 router = APIRouter(prefix="/admin/providers", tags=["admin-providers"])
 store = PersistentProviderStore()
-
-
-def require_admin(
-    x_admin_api_key: str | None = Header(default=None),
-    authorization: str | None = Header(default=None),
-) -> None:
-    if authorization:
-        scheme, _, token = authorization.partition(" ")
-        if scheme.lower() == "bearer" and token and verify_admin_token(token):
-            return
-
-    expected = settings.admin_api_key
-    if expected and x_admin_api_key and hmac.compare_digest(x_admin_api_key, expected):
-        return
-    if not expected and not settings.admin_token_secret:
-        raise HTTPException(
-            status_code=503,
-            detail="Gestão administrativa não configurada no servidor",
-        )
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Credencial administrativa inválida",
-    )
 
 
 class ProviderProbeRequest(BaseModel):
@@ -54,7 +28,7 @@ class ProviderSaveRequest(ProviderConfig):
 @router.get(
     "",
     response_model=list[ProviderPublicView],
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_admin_session)],
 )
 async def list_providers() -> list[ProviderPublicView]:
     return [ProviderPublicView.from_config(p) for p in store.list_configs()]
@@ -63,7 +37,7 @@ async def list_providers() -> list[ProviderPublicView]:
 @router.put(
     "/{provider_id}",
     response_model=ProviderPublicView,
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_admin_session)],
 )
 async def save_provider(provider_id: str, config: ProviderSaveRequest) -> ProviderPublicView:
     if provider_id != config.id:
@@ -77,7 +51,7 @@ async def save_provider(provider_id: str, config: ProviderSaveRequest) -> Provid
 
 @router.delete(
     "/{provider_id}",
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_admin_session)],
 )
 async def delete_provider(provider_id: str) -> dict[str, bool]:
     if not store.delete_config(provider_id):
@@ -85,7 +59,7 @@ async def delete_provider(provider_id: str) -> dict[str, bool]:
     return {"deleted": True}
 
 
-@router.post("/probe", dependencies=[Depends(require_admin)])
+@router.post("/probe", dependencies=[Depends(require_admin_session)])
 async def probe_provider(request: ProviderProbeRequest) -> dict[str, object]:
     result = await store.execute_get(request.capability, request.path)
     return {

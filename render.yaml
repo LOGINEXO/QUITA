@@ -15,8 +15,6 @@ services:
         fromDatabase:
           name: quita-postgres
           property: connectionString
-      - key: QUITA_ADMIN_API_KEY
-        generateValue: true
       - key: QUITA_REQUEST_TIMEOUT_SECONDS
         value: "8"
 

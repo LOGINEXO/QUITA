@@ -79,13 +79,13 @@ Nunca commite chaves reais. Use variáveis de ambiente/secret manager em produç
 
 ## Login administrativo
 
-O login administrativo usa o e-mail configurado em `QUITA_ADMIN_EMAIL` e a senha guardada somente no ambiente do servidor.
+O painel administrativo usa login por e-mail e senha e mantém a sessão em um cookie HttpOnly; não usa JWT, Bearer token, token administrativo nem chave de API administrativa.
 
 Configure em **Render → quita-api → Environment**:
 
-- `QUITA_ADMIN_EMAIL`: e-mail do administrador.
+- `QUITA_ADMIN_EMAIL`: e-mail do administrador (padrão: `usernovapagina@gmail.com`).
 - `QUITA_ADMIN_PASSWORD`: senha exclusiva com pelo menos 12 caracteres.
-- `QUITA_ADMIN_TOKEN_SECRET`: segredo aleatório com pelo menos 32 caracteres.
-- `QUITA_ADMIN_TOKEN_TTL_MINUTES`: `30` (opcional; padrão de 30 minutos).
+- `QUITA_ADMIN_COOKIE_SECURE`: mantenha `true` em produção HTTPS (padrão: `true`).
+- `QUITA_REDIS_URL`: URL privada do Redis/Key Value, necessária para armazenar sessões compartilhadas.
 
-Não coloque a senha nem o segredo no GitHub ou em mensagens. Após o deploy, faça login com `POST /auth/admin/login`, enviando JSON com `email` e `password`. A resposta contém `access_token`; envie-o como `Authorization: Bearer <access_token>`. `GET /auth/admin/me` valida o token. A chave administrativa existente `X-Admin-Api-Key` continua aceita nas rotas de provedores.
+Não coloque a senha no GitHub nem em mensagens. Faça login em `POST /auth/admin/login), enviando JSON com `email` e `password`. Quando as credenciais forem válidas, a API define o cookie `quita_admin_session` com as flags HttpOnly, Secure e SameSite=Lax. O navegador envia esse cookie automaticamente nas chamadas seguintes. `GET /auth/admin/me` retorna a identidade da sessão e `POST /auth/admin/logout` encerra a sessão. As sessões expiram após 30 minutos. As rotas administrativas de provedores, leads e consultas veiculares exigem esse cookie.
