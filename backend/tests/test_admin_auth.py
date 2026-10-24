@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from app.api.admin_auth import verify_admin_token
+from app.api.providers import require_admin
 from app.config import settings
 from app.main import app
 
@@ -75,11 +75,4 @@ def test_provider_management_accepts_admin_bearer_token(monkeypatch):
         },
     )
     token = login.json()["access_token"]
-    # A successful auth passes the route's security dependency; the DB may be
-    # unavailable in unit tests, so only assert that auth is not rejected.
-    response = client.get(
-        "/admin/providers",
-        headers={"Authorization": f"Bearer {token}"},
-    )
-    assert response.status_code != 401
-    assert response.status_code != 503
+    assert require_admin(authorization=f"Bearer {token}") is None
