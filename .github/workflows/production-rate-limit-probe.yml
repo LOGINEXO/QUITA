@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - test/redis-rate-limit-production-path
+      - main
 
 jobs:
   probe:
