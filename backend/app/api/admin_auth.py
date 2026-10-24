@@ -7,7 +7,7 @@ import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 from app.config import settings
 
@@ -18,7 +18,7 @@ _TOKEN_AUDIENCE = "quita-admin"
 
 
 class AdminLoginRequest(BaseModel):
-    email: EmailStr
+    email: str = Field(min_length=3, max_length=254)
     password: str = Field(min_length=1, max_length=1024)
 
 
