@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.api.providers import require_admin
+from app.api.admin_auth import require_admin_session
 from app.db.models import AuditEvent, Lead, VehicleConsultation
 from app.db.session import get_db
 from app.integrations.buscafipe import BuscaFipeClient, BuscaFipeError
@@ -160,7 +160,7 @@ async def create_vehicle_consultation(
 @router.get(
     "/admin/consultations/vehicle",
     response_model=list[VehicleConsultationAdminView],
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_admin_session)],
 )
 def list_vehicle_consultations(
     consultation_status: str | None = Query(
