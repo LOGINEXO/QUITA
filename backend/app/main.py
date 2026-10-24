@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from redis.asyncio import Redis
 
+from app.config import settings
 from app.rate_limit import InMemoryRateLimitMiddleware
 
 from app.api.admin_auth import router as admin_auth_router
@@ -32,3 +34,41 @@ app.include_router(database_health_router)
 async def health() -> dict[str, str]:
     """Liveness sem dependência do banco, útil para orquestradores."""
     return {"status": "ok"}
+
+
+@app.get("/health/rate-limit", tags=["health"])
+async def rate_limit_health() -> dict[str, str | bool]:
+    """Verifica se a configuração Redis usada pelo limitador está acessível."""
+    if not settings.redis_url:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "degraded",
+                "backend": "in-memory",
+                "redis_configured": False,
+                "redis_reachable": False,
+            },
+        )
+
+    client = Redis.from_url(settings.redis_url, decode_responses=True)
+    try:
+        await client.ping()
+    except Exception:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "degraded",
+                "backend": "redis",
+                "redis_configured": True,
+                "redis_reachable": False,
+            },
+        )
+    finally:
+        await client.aclose()
+
+    return {
+        "status": "ok",
+        "backend": "redis",
+        "redis_configured": True,
+        "redis_reachable": True,
+    }
