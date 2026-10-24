@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.api.providers import require_admin
+from app.api.admin_auth import require_admin_session
 from app.db.models import AuditEvent, Customer, Lead
 from app.db.session import get_db
 
@@ -127,7 +127,7 @@ def create_lead(payload: LeadCreateRequest, db: Session = Depends(get_db)) -> Le
 @router.get(
     "/admin/leads",
     response_model=list[LeadAdminView],
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_admin_session)],
 )
 def list_leads(
     lead_status: str | None = Query(default=None, alias="status", pattern=r"^(new|contacted|qualified|converted|closed)$"),
