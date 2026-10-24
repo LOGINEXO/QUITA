@@ -85,7 +85,7 @@ Configure em **Render → quita-api → Environment**:
 
 - `QUITA_ADMIN_EMAIL`: e-mail do administrador (padrão: `usernovapagina@gmail.com`).
 - `QUITA_ADMIN_PASSWORD`: senha exclusiva com pelo menos 12 caracteres.
-- `QUITA_ADMIN_COOKIE_SECURE`: mantenha `true) em produção HTTPS (padrão: `true`).
+- `QUITA_ADMIN_COOKIE_SECURE`: mantenha `true` em produção HTTPS (padrão: `true`).
 - `QUITA_REDIS_URL`: URL privada do Redis/Key Value, necessária para armazenar sessões compartilhadas.
 
 Não coloque a senha no GitHub nem em mensagens. Faça login em `POST /auth/admin/login), enviando JSON com `email` e `password`. Quando as credenciais forem válidas, a API define o cookie `quita_admin_session` com as flags HttpOnly, Secure e SameSite=Lax. O navegador envia esse cookie automaticamente nas chamadas seguintes. `GET /auth/admin/me` retorna a identidade da sessão e `POST /auth/admin/logout` encerra a sessão. As sessões expiram após 30 minutos. As rotas administrativas de provedores, leads e consultas veiculares exigem esse cookie.
