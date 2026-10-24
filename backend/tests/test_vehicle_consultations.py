@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.api import vehicle_consultations as vehicle_api
+from app.config import settings
 from app.db.models import Base
 from app.db.session import get_db
 from app.main import app
@@ -26,13 +27,17 @@ def override_get_db():
         session.close()
 
 
-app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
 def setup_function():
+    app.dependency_overrides[get_db] = override_get_db
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
+
+
+def teardown_function():
+    app.dependency_overrides.pop(get_db, None)
 
 
 def test_vehicle_consultation_persists_success(monkeypatch):
@@ -70,6 +75,10 @@ def test_vehicle_consultation_rejects_invalid_plate_without_provider_call(monkey
     assert response.status_code == 422
 
 
-def test_admin_vehicle_consultation_list_requires_authentication():
+def test_admin_vehicle_consultation_list_requires_authentication(monkeypatch):
+    monkeypatch.setattr(settings, "admin_email", "admin@example.com")
+    monkeypatch.setattr(settings, "admin_password", "a-long-test-password")
+    monkeypatch.setattr(settings, "admin_token_secret", "test-secret-that-is-at-least-32-characters-long")
+    monkeypatch.setattr(settings, "admin_token_ttl_minutes", 30)
     response = client.get("/admin/consultations/vehicle")
     assert response.status_code == 401
