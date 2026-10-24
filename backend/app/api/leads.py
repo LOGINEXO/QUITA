@@ -159,7 +159,7 @@ def list_leads(
 @router.patch(
     "/admin/leads/{lead_id}",
     response_model=LeadAdminView,
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_admin_session)],
 )
 def update_lead(
     lead_id: int,
