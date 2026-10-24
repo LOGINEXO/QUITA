@@ -10,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.providers import require_admin
-from app.db.models import Lead, VehicleConsultation
+from app.db.models import AuditEvent, Lead, VehicleConsultation
 from app.db.session import get_db
 from app.integrations.buscafipe import BuscaFipeClient, BuscaFipeError
 from app.config import settings
@@ -67,6 +67,16 @@ async def create_vehicle_consultation(
         provider_id="buscafipe",
     )
     db.add(consultation)
+    db.flush()
+    db.add(
+        AuditEvent(
+            actor_id="public",
+            action="vehicle_consultation.requested",
+            resource_type="vehicle_consultation",
+            resource_id=str(consultation.id),
+            details_json={"provider_id": "buscafipe", "lead_id": payload.lead_id},
+        )
+    )
     db.commit()
     db.refresh(consultation)
 
@@ -82,6 +92,15 @@ async def create_vehicle_consultation(
         consultation.status = "unavailable"
         consultation.error_code = "provider_unavailable"
         consultation.completed_at = datetime.now(timezone.utc)
+        db.add(
+            AuditEvent(
+                actor_id="system",
+                action="vehicle_consultation.completed",
+                resource_type="vehicle_consultation",
+                resource_id=str(consultation.id),
+                details_json={"status": "unavailable", "error_code": consultation.error_code},
+            )
+        )
         db.commit()
         db.refresh(consultation)
         return VehicleConsultationResponse(
@@ -99,12 +118,30 @@ async def create_vehicle_consultation(
         consultation.status = "failed"
         consultation.error_code = "provider_error"
         consultation.completed_at = datetime.now(timezone.utc)
+        db.add(
+            AuditEvent(
+                actor_id="system",
+                action="vehicle_consultation.completed",
+                resource_type="vehicle_consultation",
+                resource_id=str(consultation.id),
+                details_json={"status": "failed", "error_code": consultation.error_code},
+            )
+        )
         db.commit()
         raise HTTPException(status_code=502, detail="Falha inesperada na consulta veicular") from exc
 
     consultation.status = "success"
     consultation.result_json = result
     consultation.completed_at = datetime.now(timezone.utc)
+    db.add(
+        AuditEvent(
+            actor_id="system",
+            action="vehicle_consultation.completed",
+            resource_type="vehicle_consultation",
+            resource_id=str(consultation.id),
+            details_json={"status": "success"},
+        )
+    )
     db.commit()
     db.refresh(consultation)
     return VehicleConsultationResponse(
