@@ -1,6 +1,9 @@
+import hmac
+
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pydantic import BaseModel, model_validator
 
+from app.api.admin_auth import verify_admin_token
 from app.config import settings
 from app.providers.models import ProviderCapability, ProviderConfig, ProviderPublicView
 from app.providers.persistence import PersistentProviderStore, secret_environment_name
@@ -9,18 +12,27 @@ router = APIRouter(prefix="/admin/providers", tags=["admin-providers"])
 store = PersistentProviderStore()
 
 
-def require_admin(x_admin_api_key: str | None = Header(default=None)) -> None:
+def require_admin(
+    x_admin_api_key: str | None = Header(default=None),
+    authorization: str | None = Header(default=None),
+) -> None:
+    if authorization:
+        scheme, _, token = authorization.partition(" ")
+        if scheme.lower() == "bearer" and token and verify_admin_token(token):
+            return
+
     expected = settings.admin_api_key
-    if not expected:
+    if expected and x_admin_api_key and hmac.compare_digest(x_admin_api_key, expected):
+        return
+    if not expected and not settings.admin_token_secret:
         raise HTTPException(
             status_code=503,
             detail="Gestão administrativa não configurada no servidor",
         )
-    if x_admin_api_key is None or x_admin_api_key != expected:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Credencial administrativa inválida",
-        )
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Credencial administrativa inválida",
+    )
 
 
 class ProviderProbeRequest(BaseModel):
