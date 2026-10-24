@@ -35,8 +35,6 @@ client = TestClient(app)
 def isolate_test_dependencies(monkeypatch):
     previous = app.dependency_overrides.get(get_db)
     app.dependency_overrides[get_db] = override_get_db
-    monkeypatch.setattr(settings, "admin_api_key", "test-admin-key")
-    monkeypatch.setattr(settings, "admin_token_secret", "test-secret-that-is-at-least-32-characters-long")
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     yield
