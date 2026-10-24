@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.providers import require_admin
-from app.db.models import Customer, Lead
+from app.db.models import AuditEvent, Customer, Lead
 from app.db.session import get_db
 
 router = APIRouter(tags=["leads"])
@@ -109,6 +109,16 @@ def create_lead(payload: LeadCreateRequest, db: Session = Depends(get_db)) -> Le
     db.flush()
     lead = Lead(customer_id=customer.id, source=payload.source, status="new")
     db.add(lead)
+    db.flush()
+    db.add(
+        AuditEvent(
+            actor_id="public",
+            action="lead.created",
+            resource_type="lead",
+            resource_id=str(lead.id),
+            details_json={"source": payload.source},
+        )
+    )
     db.commit()
     db.refresh(lead)
     return LeadCreatedResponse(id=lead.id, status=lead.status, created_at=lead.created_at)
@@ -162,6 +172,15 @@ def update_lead(
     lead.status = payload.status
     if payload.notes is not None:
         lead.notes = payload.notes
+    db.add(
+        AuditEvent(
+            actor_id="admin",
+            action="lead.updated",
+            resource_type="lead",
+            resource_id=str(lead.id),
+            details_json={"status": payload.status, "notes_changed": payload.notes is not None},
+        )
+    )
     db.commit()
     db.refresh(lead)
     customer = db.get(Customer, lead.customer_id)
