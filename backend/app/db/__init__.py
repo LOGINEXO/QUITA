@@ -1,0 +1,1 @@
+"""Persistência SQLAlchemy do QUITA."""
