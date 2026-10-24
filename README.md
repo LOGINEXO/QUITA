@@ -27,6 +27,13 @@ Para configurar a chave de um provedor, defina no ambiente do serviço Render a 
 - `GET /admin/leads`: lista leads para uso administrativo. Aceita `status`, `limit` (1–200) e `offset`. Requer autenticação administrativa.
 - `PATCH /admin/leads/{lead_id}`: atualiza o status (`new`, `contacted`, `qualified`, `converted`, `closed`) e opcionalmente as notas. Requer autenticação administrativa.
 
+## Consultas veiculares
+
+- `POST /consultations/vehicle`: valida e normaliza a placa, consulta a BuscaFIPE e salva a consulta, o resultado e o estado no PostgreSQL. Aceita `lead_id` opcional para associar a consulta a um lead.
+- `GET /admin/consultations/vehicle`: lista consultas para administradores, com filtros opcionais por `status` e `lead_id`, paginação por `limit` e `offset`. Requer autenticação administrativa.
+- Os estados persistidos são `pending`, `success`, `unavailable` e `failed`. Uma indisponibilidade do fornecedor não é tratada como confirmação de ausência de débitos ou restrições.
+- A consulta por placa depende da disponibilidade e das condições comerciais do fornecedor. A API não promete dados que o fornecedor não disponibilizar.
+
 ## Integração BuscaFIPE
 
 O backend possui um cliente server-side para a API documentada em `https://buscafipe.com/api`.
@@ -40,7 +47,7 @@ Documentação de referência: https://buscafipe.com/api-docs/
 
 A documentação informa 100 consultas/dia sem autenticação para FIPE/IPVA. Ela lista CNPJ como gratuito, mas também descreve acesso de parceiro com chave para todos os endpoints; confirme com o fornecedor a disponibilidade do endpoint de CNPJ por API e o mecanismo de autenticação. A consulta por placa aparece como premium/parceiro. O código não inventa um formato de chave que a documentação não descreva. Respostas HTTP 429 e falhas de rede são expostas como indisponibilidade, não como ausência de débitos.
 
-As rotas de consulta ainda precisam de rate limiting/autenticação pública apropriada antes de serem expostas sem restrições. Não use resultados da BuscaFIPE como prova de que multas, débitos ou restrições não existem sem confirmar a cobertura da fonte.
+Antes de expor os endpoints públicos sem restrições, implemente rate limiting e controles antiabuso. Consultas por placa podem envolver dados pessoais; limite o acesso administrativo e evite armazenar ou exibir dados além do necessário.
 
 ## Desenvolvimento local
 
