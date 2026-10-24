@@ -105,6 +105,7 @@ def test_logout_deletes_session_and_clears_cookie(monkeypatch):
 
 def test_provider_admin_routes_require_browser_session(monkeypatch):
     configure_admin(monkeypatch)
+    monkeypatch.setattr("app.api.providers.store.list_configs", lambda: [])
 
     async def get_session(session_id):
         return EMAIL if session_id == "valid-session-id" else None
