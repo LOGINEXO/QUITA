@@ -13,7 +13,7 @@ O backend possui um cliente server-side para a API documentada em `https://busca
 
 Documentação de referência: https://buscafipe.com/api-docs/
 
-O plano informado pela documentação permite 100 consultas por dia para FIPE/IPVA sem autenticação. Endpoints de placa/CNPJ e cobertura ampliada podem depender de acesso de parceiro; confirme as condições e a autenticação diretamente com o fornecedor. O QUITA não presume um formato de chave que a documentação não descreva. Respostas HTTP 429 e falhas de rede são expostas como indisponibilidade, não como ausência de débitos.
+A documentação informa 100 consultas/dia sem autenticação para FIPE/IPVA. Ela lista CNPJ como gratuito, mas também descreve acesso de parceiro com chave para todos os endpoints; confirme com o fornecedor a disponibilidade do endpoint de CNPJ por API e o mecanismo de autenticação. A consulta por placa aparece como premium/parceiro. O código não inventa um formato de chave que a documentação não descreva. Respostas HTTP 429 e falhas de rede são expostas como indisponibilidade, não como ausência de débitos.
 
 As rotas de consulta estão prontas para integração, mas não substituem uma validação de contrato, política de uso, cobertura e formatos reais de resposta antes da produção.
 
