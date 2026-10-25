@@ -25,8 +25,21 @@ def test_admin_login_requires_server_password_configuration(monkeypatch):
     assert "QUITA_ADMIN_PASSWORD" in response.json()["detail"]
 
 
+def test_admin_login_allows_short_nonempty_configured_password(monkeypatch):
+    monkeypatch.setattr(settings, "admin_email", EMAIL)
+    monkeypatch.setattr(settings, "admin_password", "abc")
+    with TestClient(app) as client:
+        response = client.post(
+            "/auth/admin/login",
+            json={"email": EMAIL, "password": "wrong"},
+        )
+    # Configuration is present; invalid credentials should return 401, not 503.
+    assert response.status_code == 401
+
+
 def test_admin_login_sets_http_only_session_cookie_and_me_works(monkeypatch):
     configure_admin(monkeypatch)
+
     async def create_session(email):
         assert email == EMAIL
         return "fake-session-id"
