@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from redis.asyncio import Redis
 
 from app.config import settings
@@ -13,7 +17,7 @@ from app.db.health import router as database_health_router
 
 app = FastAPI(
     title="QUITA API",
-    version="0.7.0",
+    version="0.8.0",
     description=(
         "API do QUITA com integração BuscaFIPE, autenticação administrativa, "
         "captação e gestão de leads, consultas veiculares persistidas, gestão de provedores "
@@ -28,6 +32,16 @@ app.include_router(leads_router)
 app.include_router(vehicle_consultations_router)
 app.include_router(buscafipe_router)
 app.include_router(database_health_router)
+
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR / "static"), name="static")
+
+
+@app.get("/", include_in_schema=False)
+@app.get("/admin", include_in_schema=False)
+@app.get("/admin/login", include_in_schema=False)
+async def admin_frontend() -> FileResponse:
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 @app.get("/health", tags=["health"])
