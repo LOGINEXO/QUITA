@@ -34,7 +34,7 @@
     } catch (error) {
       if (error.status === 401) safeMessage("E-mail ou senha inválidos. Confira os dados e tente novamente.");
       else if (error.status === 429) safeMessage("Muitas tentativas em sequência. Aguarde um pouco antes de tentar novamente.");
-      else if (error.status === 503) safeMessage("O serviço de autenticação está indisponível ou não está configurado. Verifique o estado do servidor.");
+      else if (error.status === 503) safeMessage("Servidor: " + error.message);
       else safeMessage(error.message || "Falha de conexão. Tente novamente.");
     } finally {
       submit.disabled = false;
