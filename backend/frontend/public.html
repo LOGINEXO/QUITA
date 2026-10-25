@@ -30,7 +30,8 @@
 <div class="field"><label for="lookup-plate">Placa do veículo</label><input id="lookup-plate" name="plate" maxlength="10" autocapitalize="characters" required placeholder="ABC1D23 ou ABC1234"></div>
 <button class="submit" type="submit">Consultar placa ↗</button>
 </form><p id="plate-status" class="privacy" role="status" aria-live="polite"></p><pre id="plate-result" class="hidden" style="white-space:pre-wrap;overflow-wrap:anywhere;background:#090f1b;border:1px solid #293348;border-radius:10px;padding:16px;color:#dbe8f8;font:12px/1.7 monospace;max-height:420px;overflow:auto"></pre></div>
-</section>\n<section id="solicitacao"><div class="section-head"><div class="eyebrow"><span class="pulse"></span> FORMULÁRIO DE ATENDIMENTO</div><h2>Conte-nos sobre seu financiamento</h2><p>Preencha o que souber. Os campos marcados com * são obrigatórios; informações que você não tiver podem ser esclarecidas durante o atendimento.</p></div>
+</section>
+<section id="solicitacao"><div class="section-head"><div class="eyebrow"><span class="pulse"></span> FORMULÁRIO DE ATENDIMENTO</div><h2>Conte-nos sobre seu financiamento</h2><p>Preencha o que souber. Os campos marcados com * são obrigatórios; informações que você não tiver podem ser esclarecidas durante o atendimento.</p></div>
 <div class="form-card"><form id="client-form" class="form-grid">
 <div class="group-title"><span>01</span> Seus dados</div>
 <div class="field"><label for="full_name">Nome completo *</label><input id="full_name" name="Nome completo" autocomplete="name" required maxlength="180" placeholder="Como podemos chamar você?"></div>
@@ -121,7 +122,6 @@ form.addEventListener('submit',e=>{
  spin.addEventListener('click',()=>{controlState.spinning=!controlState.spinning;spin.textContent='360°: '+(controlState.spinning?'ligado':'desligado');spin.setAttribute('aria-pressed',String(controlState.spinning));});
  setStatus('Carregando modelo 3D…');
  const threeUrl='https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
- const canvas=document.getElementById('car-3d'); if(!canvas)return;
  import(threeUrl).then(THREE=>{
   const scene=new THREE.Scene(); scene.background=null;
   const camera=new THREE.PerspectiveCamera(34,1,.1,100); camera.position.set(5.9,3.25,7.2); camera.lookAt(0,.55,0);
