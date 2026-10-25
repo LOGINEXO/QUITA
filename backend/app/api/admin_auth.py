@@ -23,7 +23,7 @@ class AdminLoginRequest(BaseModel):
 
 
 def _configured() -> bool:
-    return bool(settings.admin_email.strip()) and len(settings.admin_password) >= 12
+    return bool(settings.admin_email.strip()) and bool(settings.admin_password)
 
 
 async def require_admin_session(request: Request) -> str:
