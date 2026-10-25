@@ -112,6 +112,16 @@ form.addEventListener('submit',e=>{
 <script type="module">
 (()=> {
  const canvas=document.getElementById('car-3d'); if(!canvas)return;
+ // Bind controls immediately so they never appear dead while the 3D library loads.
+ let controlState={exploded:false,spinning:true,ready:false,car:null,parts:[],wheels:[]};
+ const assemble=document.getElementById('car-assemble'), explode=document.getElementById('car-explode'), spin=document.getElementById('car-spin');
+ const setStatus=(message)=>{let el=document.getElementById('car-status');if(!el){el=document.createElement('div');el.id='car-status';el.className='car-hint';el.style.top='auto';el.style.bottom='48px';canvas.parentElement.appendChild(el)}el.textContent=message};
+ assemble.addEventListener('click',()=>{controlState.exploded=false;assemble.classList.add('active');explode.classList.remove('active');if(controlState.ready)setStatus('Veículo montado');});
+ explode.addEventListener('click',()=>{controlState.exploded=true;explode.classList.add('active');assemble.classList.remove('active');if(controlState.ready)setStatus('Peças separadas');});
+ spin.addEventListener('click',()=>{controlState.spinning=!controlState.spinning;spin.textContent='360°: '+(controlState.spinning?'ligado':'desligado');spin.setAttribute('aria-pressed',String(controlState.spinning));});
+ setStatus('Carregando modelo 3D…');
+ const threeUrl='https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+ const canvas=document.getElementById('car-3d'); if(!canvas)return;
  const threeUrl='https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
  import(threeUrl).then(THREE=>{
   const scene=new THREE.Scene(); scene.background=null;
@@ -171,23 +181,22 @@ form.addEventListener('submit',e=>{
   const floorGeo=new THREE.CircleGeometry(1.25,48);const floorMat=new THREE.MeshBasicMaterial({color:0x24dbe5,transparent:true,opacity:.12});
   const halo=new THREE.Mesh(floorGeo,floorMat);halo.rotation.x=-Math.PI/2;halo.scale.set(1.8,.72,1);halo.position.y=.06;scene.add(halo);
   // Disassembly positions move components away from the chassis, then return smoothly.
-  let exploded=false,spinning=true,dragging=false,px=0,py=0, targetY=.25,targetX=-.08, autoAngle=0;
-  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduced)spinning=false;
+  let dragging=false,px=0,py=0, targetY=.25,targetX=-.08, autoAngle=0;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)controlState.spinning=false;
+  controlState.ready=true;controlState.car=car;controlState.parts=parts;controlState.wheels=wheels;
+  setStatus('Modelo 3D pronto · arraste para girar');
   function resize(){const r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}
   new ResizeObserver(resize).observe(canvas);resize();
   canvas.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;canvas.setPointerCapture(e.pointerId)});
   canvas.addEventListener('pointermove',e=>{if(!dragging)return;targetY+=(e.clientX-px)*.012;targetX+=(e.clientY-py)*.008;targetX=Math.max(-.45,Math.min(.45,targetX));px=e.clientX;py=e.clientY});
   canvas.addEventListener('pointerup',()=>dragging=false);canvas.addEventListener('pointercancel',()=>dragging=false);
-  document.getElementById('car-assemble').addEventListener('click',()=>{exploded=false;document.getElementById('car-explode').classList.remove('active');document.getElementById('car-assemble').classList.add('active')});
-  document.getElementById('car-explode').addEventListener('click',()=>{exploded=true;document.getElementById('car-assemble').classList.remove('active');document.getElementById('car-explode').classList.add('active')});
-  document.getElementById('car-spin').addEventListener('click',e=>{spinning=!spinning;e.currentTarget.textContent='360°: '+(spinning?'ligado':'desligado');e.currentTarget.setAttribute('aria-pressed',String(spinning))});
-  document.getElementById('car-assemble').classList.add('active');
+  assemble.classList.add('active');
   const clock=new THREE.Clock();
-  function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();if(spinning&&!dragging)autoAngle+=.0045;car.rotation.y+=(targetY+autoAngle-car.rotation.y)*.045;car.rotation.x+=(targetX+Math.sin(t*.8)*.018-car.rotation.x)*.045;car.position.y=Math.sin(t*1.7)*.035;
-   for(const p of parts){const to=exploded?p.explode:new THREE.Vector3(0,0,0);p.g.position.x+=(p.base.x+to.x-p.g.position.x)*.075;p.g.position.y+=(p.base.y+to.y-p.g.position.y)*.075;p.g.position.z+=(p.base.z+to.z-p.g.position.z)*.075}
-   wheels.forEach(w=>{if(spinning)w.rotation.z-=.025});
+  function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();if(controlState.spinning&&!dragging)autoAngle+=.0045;car.rotation.y+=(targetY+autoAngle-car.rotation.y)*.045;car.rotation.x+=(targetX+Math.sin(t*.8)*.018-car.rotation.x)*.045;car.position.y=Math.sin(t*1.7)*.035;
+   for(const p of parts){const to=controlState.exploded?p.explode:new THREE.Vector3(0,0,0);p.g.position.x+=(p.base.x+to.x-p.g.position.x)*.075;p.g.position.y+=(p.base.y+to.y-p.g.position.y)*.075;p.g.position.z+=(p.base.z+to.z-p.g.position.z)*.075}
+   wheels.forEach(w=>{if(controlState.spinning)w.rotation.z-=.025});
    renderer.render(scene,camera)}
   animate();
- }).catch(()=>{canvas.insertAdjacentHTML('afterend','<p style="color:#9ba5bb;font-size:11px;text-align:center">O modelo 3D precisa de conexão para carregar.</p>')});
+ }).catch(err=>{setStatus('Falha ao carregar o motor 3D. Recarregue a página.');console.error('QUITA 3D load error:',err)});
 })();
 </script></body></html>
