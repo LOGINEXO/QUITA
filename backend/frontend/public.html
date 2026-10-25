@@ -141,7 +141,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/
  canvas.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;canvas.setPointerCapture(e.pointerId)});
  canvas.addEventListener('pointermove',e=>{if(!dragging)return;targetY+=(e.clientX-px)*.012;targetX=Math.max(-.35,Math.min(.35,targetX+(e.clientY-py)*.008));px=e.clientX;py=e.clientY});
  canvas.addEventListener('pointerup',()=>dragging=false);canvas.addEventListener('pointercancel',()=>dragging=false);
- const modelUrl='https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/SportsCar/glTF-Binary/SportsCar.glb';
+ const modelUrl='https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb';
  new GLTFLoader().load(modelUrl,gltf=>{
    model=gltf.scene;
    model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;parts.push({object:o,base:o.position.clone(),direction:new THREE.Vector3((Math.random()-.5)*1.5,.35+Math.random()*.7,(Math.random()-.5)*1.5)})}});
