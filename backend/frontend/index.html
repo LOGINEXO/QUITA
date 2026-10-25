@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080b14">
-  <meta name="description" content="QUITA — painel administrativo seguro.">
+  <meta name="description" content="QUITA — central administrativa de inteligência veicular.">
   <title>QUITA — Painel administrativo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,16 +68,42 @@
       </section>
     </section>
     <section id="dashboard-view" class="dashboard hidden">
-      <header class="dash-header"><div class="brand"><span class="brand-mark"><span></span><span></span><span></span></span><span>QUITA</span><small>CONTROL CENTER</small></div><div class="dash-user"><span class="online-dot"></span><span id="admin-email"></span><button id="logout-button" class="logout-button">Sair <span>↗</span></button></div></header>
-      <div class="dash-main"><div class="eyebrow"><span class="pulse"></span> VISÃO GERAL</div><h1>Seu centro de <em>controle.</em></h1><p class="dash-intro">Sessão administrativa ativa. Selecione uma área para continuar.</p>
-      <div class="status-card"><div class="status-icon"><svg viewBox="0 0 24 24"><path d="M4 12.5 9 17l11-11"></path></svg></div><div><strong>Autenticação confirmada</strong><p>Sua sessão foi validada pelo servidor QUITA.</p></div><span class="status-tag">SESSÃO ATIVA</span></div>
-      <div class="dash-grid">
-        <a class="dash-card" href="/docs"><span class="card-index">01 / API</span><div class="card-symbol">↗</div><h3>Documentação da API</h3><p>Rotas, contratos e ferramentas disponíveis no backend.</p><span class="card-link">Abrir documentação <b>→</b></span></a>
-        <button class="dash-card" id="check-api"><span class="card-index">02 / SISTEMA</span><div class="card-symbol">⌁</div><h3>Estado do sistema</h3><p id="api-status">Verifique a disponibilidade da API e dos serviços.</p><span class="card-link">Verificar conexão <b>→</b></span></button>
-        <a class="dash-card" href="/health"><span class="card-index">03 / SAÚDE</span><div class="card-symbol">◎</div><h3>Saúde da API</h3><p>Endpoint público de verificação de disponibilidade.</p><span class="card-link">Consultar estado <b>→</b></span></a>
+      <aside class="admin-sidebar">
+        <div class="brand"><span class="brand-mark"><span></span><span></span><span></span></span><span>QUITA</span><small>CONTROL CENTER</small></div>
+        <div class="sidebar-user"><span class="online-dot"></span><div><strong id="admin-email"></strong><small>Administrador</small></div></div>
+        <nav class="admin-nav" aria-label="Navegação administrativa">
+          <button class="nav-item active" data-page="overview">⌂ <span>Visão geral</span></button>
+          <button class="nav-item" data-page="vehicles">▣ <span>Consultas veiculares</span></button>
+          <button class="nav-item" data-page="leads">♙ <span>Leads</span></button>
+          <button class="nav-item" data-page="providers">⌘ <span>Integrações</span></button>
+          <button class="nav-item" data-page="security">⬡ <span>Segurança</span></button>
+          <a class="nav-item" href="/docs">↗ <span>Documentação da API</span></a>
+        </nav>
+        <button id="logout-button" class="logout-button">↗ <span>Sair da conta</span></button>
+        <div class="sidebar-security"><span>⬡</span><div><strong>Sessão protegida</strong><small>Cookie HttpOnly</small></div></div>
+      </aside>
+      <div class="admin-workspace">
+        <header class="workspace-header"><div><div class="eyebrow"><span class="pulse"></span> QUITA / CONTROL CENTER</div><h1 id="page-title">Visão geral</h1></div><div class="header-actions"><span id="system-pill" class="system-pill"><i></i> Verificando sistema</span><button id="refresh-button" class="refresh-button">↻ Atualizar</button></div></header>
+        <section id="page-overview" class="admin-page">
+          <div class="welcome-banner"><div class="banner-copy"><div class="eyebrow">CENTRAL DE OPERAÇÕES VEICULARES</div><h2>Seu centro de <em>controle.</em></h2><p>Gerencie consultas, leads e integrações em um só lugar.</p><button class="primary-action" data-go="vehicles">Abrir consultas veiculares <b>→</b></button></div>
+            <div class="road-scene" aria-label="Carro esportivo acelerando por uma estrada futurista"><div class="road-sky"></div><div class="road-city"></div><div class="road-surface"><span></span><span></span><span></span><span></span></div><div class="speed-streak streak-a"></div><div class="speed-streak streak-b"></div><svg class="driving-car" viewBox="0 0 620 300" role="img" aria-label="Carro esportivo azul em movimento"><defs><linearGradient id="movingPaint" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#dfffff"/><stop offset=".22" stop-color="#36dbe5"/><stop offset=".58" stop-color="#1467bb"/><stop offset="1" stop-color="#07172e"/></linearGradient><linearGradient id="movingGlass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8bfff8"/><stop offset=".45" stop-color="#173c66"/><stop offset="1" stop-color="#071021"/></linearGradient></defs><ellipse cx="316" cy="245" rx="236" ry="22" fill="#00d9ff" opacity=".28"/><path d="M64 192 111 155Q130 142 168 138L227 79Q244 62 278 64L373 70Q405 74 427 101L476 145 530 162Q551 169 556 191L544 213 482 226 123 222 70 210Z" fill="url(#movingPaint)" stroke="#9affff" stroke-width="2.5"/><path d="M207 132 250 87Q260 77 280 79L324 81 324 133Z" fill="url(#movingGlass)" stroke="#a0fff8"/><path d="M335 82 370 85Q393 87 411 109L430 133 335 133Z" fill="url(#movingGlass)" stroke="#a0fff8"/><path d="M326 80 331 135" stroke="#c8fffd" stroke-width="2"/><path d="M112 160 190 145 172 166 95 183Z" fill="#efffff"/><path d="M439 151 495 170 515 185 463 179Z" fill="#ff557b"/><path d="M84 194 185 201 465 201 546 191" fill="none" stroke="#b5ffff" stroke-width="4"/><path d="M147 222 473 222" stroke="#05101f" stroke-width="10"/><g class="wheel wheel-front"><circle cx="202" cy="211" r="42" fill="#030813" stroke="#478ba8" stroke-width="5"/><circle cx="202" cy="211" r="27" fill="#6bb9cb" stroke="#d1ffff" stroke-width="3"/><circle cx="202" cy="211" r="8" fill="#09233a"/><path d="M202 186V236M177 211H227M184 193 220 229M220 193 184 229" stroke="#e1ffff" stroke-width="4"/></g><g class="wheel wheel-back"><circle cx="462" cy="211" r="42" fill="#030813" stroke="#478ba8" stroke-width="5"/><circle cx="462" cy="211" r="27" fill="#6bb9cb" stroke="#d1ffff" stroke-width="3"/><circle cx="462" cy="211" r="8" fill="#09233a"/><path d="M462 186V236M437 211H487M444 193 480 229M480 193 444 229" stroke="#e1ffff" stroke-width="4"/></g></svg><div class="headlight-beam"></div><div class="scene-label"><span class="pulse"></span> MOTOR ATIVO <b>·</b> QUITA DRIVE</div></div>
+          </div>
+          <div class="metric-grid">
+            <article class="metric-card"><span class="metric-icon cyan">▣</span><span class="metric-label">Consultas veiculares</span><strong id="metric-vehicles">—</strong><small>Registros no sistema</small></article>
+            <article class="metric-card"><span class="metric-icon violet">♙</span><span class="metric-label">Leads cadastrados</span><strong id="metric-leads">—</strong><small>Contatos captados</small></article>
+            <article class="metric-card"><span class="metric-icon green">✓</span><span class="metric-label">API QUITA</span><strong id="metric-api">—</strong><small>Disponibilidade atual</small></article>
+            <article class="metric-card"><span class="metric-icon amber">ϟ</span><span class="metric-label">Proteção Redis</span><strong id="metric-redis">—</strong><small>Rate limit compartilhado</small></article>
+          </div>
+          <div class="overview-grid"><article class="panel-card"><div class="panel-heading"><div><h3>Estado do sistema</h3><p>Verificação real dos serviços</p></div><button class="subtle-action" data-go="security">Detalhes →</button></div><div id="service-status" class="service-list"><div class="empty-state">Carregando estado dos serviços…</div></div></article><article class="panel-card"><div class="panel-heading"><div><h3>Acesso rápido</h3><p>Operações administrativas</p></div></div><div class="quick-actions"><button data-go="vehicles">▣ <span><b>Consultas veiculares</b><small>Consultar histórico salvo</small></span><b>→</b></button><button data-go="leads">♙ <span><b>Gestão de leads</b><small>Ver e atualizar contatos</small></span><b>→</b></button><button data-go="providers">⌘ <span><b>Integrações</b><small>Ver provedores configurados</small></span><b>→</b></button></div></article></div>
+          <div id="overview-message" class="inline-message" role="status"></div>
+        </section>
+        <section id="page-vehicles" class="admin-page hidden"><div class="page-toolbar"><div><h2>Consultas veiculares</h2><p>Histórico persistido de consultas por placa.</p></div><div class="toolbar-controls"><select id="vehicle-filter"><option value="">Todos os estados</option><option value="success">Concluídas</option><option value="pending">Pendentes</option><option value="unavailable">Indisponíveis</option><option value="failed">Falhas</option></select><button class="refresh-button" data-load="vehicles">Atualizar lista</button></div></div><div class="panel-card table-panel"><div id="vehicles-table" class="table-wrap"><div class="empty-state">Carregue as consultas para visualizar os registros.</div></div></div></section>
+        <section id="page-leads" class="admin-page hidden"><div class="page-toolbar"><div><h2>Leads</h2><p>Contatos captados e acompanhamento comercial.</p></div><div class="toolbar-controls"><select id="lead-filter"><option value="">Todos os status</option><option value="new">Novo</option><option value="contacted">Contatado</option><option value="qualified">Qualificado</option><option value="converted">Convertido</option><option value="closed">Encerrado</option></select><button class="refresh-button" data-load="leads">Atualizar lista</button></div></div><div class="panel-card table-panel"><div id="leads-table" class="table-wrap"><div class="empty-state">Carregue os leads para visualizar os contatos.</div></div></div></section>
+        <section id="page-providers" class="admin-page hidden"><div class="page-toolbar"><div><h2>Integrações</h2><p>Provedores cadastrados no backend. Segredos permanecem no ambiente do servidor.</p></div><button class="refresh-button" data-load="providers">Atualizar integrações</button></div><div id="providers-list" class="provider-grid"><div class="empty-state">Carregue os provedores cadastrados.</div></div><div class="integration-note">As chaves de API não são exibidas nem enviadas pelo painel. Configure os segredos em variáveis de ambiente do Render.</div></section>
+        <section id="page-security" class="admin-page hidden"><div class="page-toolbar"><div><h2>Segurança e saúde</h2><p>Diagnóstico de disponibilidade e proteção contra excesso de requisições.</p></div><button class="refresh-button" data-load="security">Executar diagnóstico</button></div><div id="security-results" class="security-grid"><div class="empty-state">Execute o diagnóstico para verificar os serviços.</div></div></section>
+        <footer class="workspace-footer"><span>QUITA CONTROL CENTER</span><span>Operação protegida · <span id="footer-version">API v0.8.0</span></span></footer>
       </div>
-      <div class="dash-bottom"><span class="pulse"></span> SESSÃO PROTEGIDA POR COOKIE HTTPONLY <span class="bottom-divider"></span> QUITA CONTROL CENTER</div></div>
-    </section>
+    </section>ion>
   </main>
   <script src="/static/app.js" defer></script>
 </body>
