@@ -55,9 +55,18 @@
   });
   document.getElementById("check-api").addEventListener("click", async () => {
     const target = document.getElementById("api-status");
-    target.textContent = "Verificando conexão…";
-    try { await api("/health", { method: "GET", headers: {} }); target.textContent = "API acessível e respondendo normalmente."; }
-    catch { target.textContent = "Não foi possível verificar a API agora. Tente novamente."; }
+    target.textContent = "Verificando API e proteção Redis…";
+    try {
+      await api("/health", { method: "GET", headers: {} });
+      const protection = await api("/health/rate-limit", { method: "GET", headers: {} });
+      target.textContent = protection.backend === "redis" && protection.redis_reachable
+        ? "API ativa. Redis conectado; proteção compartilhada funcionando."
+        : "API ativa, mas o limitador não está usando Redis compartilhado.";
+    } catch (error) {
+      target.textContent = error.status === 503
+        ? "API ativa, mas o Redis da proteção está indisponível ou não configurado."
+        : "API ativa; não foi possível confirmar o estado do Redis.";
+    }
   });
   restoreSession();
 })();
