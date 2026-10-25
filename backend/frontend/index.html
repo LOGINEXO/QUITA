@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080b14">
+  <meta name="description" content="QUITA — painel administrativo seguro.">
+  <title>QUITA — Painel administrativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <div class="grain"></div>
+  <main id="app" class="shell">
+    <section id="login-view" class="login-layout">
+      <div class="visual-panel">
+        <div class="brand"><span class="brand-mark"><span></span><span></span><span></span></span><span>QUITA</span><small>CONTROL CENTER</small></div>
+        <div class="visual-copy">
+          <div class="eyebrow"><span class="pulse"></span> AMBIENTE ADMINISTRATIVO</div>
+          <h1>Controle.<br><em>Clareza.</em><br>Resultado.</h1>
+          <p>Uma visão precisa da operação. Acesso seguro, gestão centralizada e decisões com confiança.</p>
+        </div>
+        <div class="orb-stage" aria-hidden="true">
+          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div>
+          <div class="orb"><div class="orb-core"></div><div class="orb-shine"></div><div class="orb-ring"></div></div>
+          <span class="orb-label label-top">QUITA / CORE</span><span class="orb-label label-bottom">SECURE ACCESS · 01</span>
+        </div>
+        <div class="visual-footer"><span>INFRAESTRUTURA SEGURA</span><span class="footer-line"></span><span>BRASIL · 2026</span></div>
+      </div>
+      <section class="form-panel">
+        <div class="mobile-brand"><span class="brand-mark"><span></span><span></span><span></span></span> QUITA</div>
+        <div class="form-wrap">
+          <div class="form-kicker">BEM-VINDO DE VOLTA</div>
+          <h2>Acesse seu painel<span>.</span></h2>
+          <p class="form-subtitle">Entre com suas credenciais administrativas para continuar.</p>
+          <form id="login-form" autocomplete="on">
+            <label for="email">E-mail administrativo</label>
+            <div class="field"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"></rect><path d="m4.5 7 7.5 6 7.5-6"></path></svg><input id="email" name="email" type="email" placeholder="seu@email.com" autocomplete="username" required maxlength="254"></div>
+            <div class="label-row"><label for="password">Senha</label><span class="private-note"><span class="lock-dot"></span> CONEXÃO PROTEGIDA</span></div>
+            <div class="field"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M12 14v2"></path></svg><input id="password" name="password" type="password" placeholder="Digite sua senha" autocomplete="current-password" required maxlength="1024"><button class="reveal" id="toggle-password" type="button" aria-label="Mostrar senha"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg></button></div>
+            <button class="submit-button" id="submit-button" type="submit"><span>Entrar no painel</span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+            <div id="login-message" class="message" role="alert" aria-live="polite"></div>
+          </form>
+          <div class="security-note"><span class="shield"><svg viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 4.5-2.8 7.8-7 10-4.2-2.2-7-5.5-7-10V6l7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></span><span><strong>Seus dados permanecem privados.</strong><br>Autenticação por sessão segura e cookie protegido.</span></div>
+        </div>
+        <footer class="form-footer"><span>© 2026 QUITA</span><span><i></i> SISTEMA OPERACIONAL</span></footer>
+      </section>
+    </section>
+    <section id="dashboard-view" class="dashboard hidden">
+      <header class="dash-header"><div class="brand"><span class="brand-mark"><span></span><span></span><span></span></span><span>QUITA</span><small>CONTROL CENTER</small></div><div class="dash-user"><span class="online-dot"></span><span id="admin-email"></span><button id="logout-button" class="logout-button">Sair <span>↗</span></button></div></header>
+      <div class="dash-main"><div class="eyebrow"><span class="pulse"></span> VISÃO GERAL</div><h1>Seu centro de <em>controle.</em></h1><p class="dash-intro">Sessão administrativa ativa. Selecione uma área para continuar.</p>
+      <div class="status-card"><div class="status-icon"><svg viewBox="0 0 24 24"><path d="M4 12.5 9 17l11-11"></path></svg></div><div><strong>Autenticação confirmada</strong><p>Sua sessão foi validada pelo servidor QUITA.</p></div><span class="status-tag">SESSÃO ATIVA</span></div>
+      <div class="dash-grid">
+        <a class="dash-card" href="/docs"><span class="card-index">01 / API</span><div class="card-symbol">↗</div><h3>Documentação da API</h3><p>Rotas, contratos e ferramentas disponíveis no backend.</p><span class="card-link">Abrir documentação <b>→</b></span></a>
+        <button class="dash-card" id="check-api"><span class="card-index">02 / SISTEMA</span><div class="card-symbol">⌁</div><h3>Estado do sistema</h3><p id="api-status">Verifique a disponibilidade da API e dos serviços.</p><span class="card-link">Verificar conexão <b>→</b></span></button>
+        <a class="dash-card" href="/health"><span class="card-index">03 / SAÚDE</span><div class="card-symbol">◎</div><h3>Saúde da API</h3><p>Endpoint público de verificação de disponibilidade.</p><span class="card-link">Consultar estado <b>→</b></span></a>
+      </div>
+      <div class="dash-bottom"><span class="pulse"></span> SESSÃO PROTEGIDA POR COOKIE HTTPONLY <span class="bottom-divider"></span> QUITA CONTROL CENTER</div></div>
+    </section>
+  </main>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
