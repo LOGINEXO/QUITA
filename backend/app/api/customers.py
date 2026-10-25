@@ -34,7 +34,7 @@ class CustomerCreate(BaseModel):
         if not value or not value.strip():
             return None
         value = value.strip().lower()
-        if not re.fullmatch(r"[^\\s@]+@[^\\s@]+\\.[^\\s@]+", value):
+        if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", value):
             raise ValueError("E-mail inválido")
         return value
 
@@ -43,7 +43,7 @@ class CustomerCreate(BaseModel):
     def clean_phone(cls, value: str | None) -> str | None:
         if not value or not value.strip():
             return None
-        digits = re.sub(r"\\D", "", value)
+        digits = re.sub(r"\D", "", value)
         if not 10 <= len(digits) <= 15:
             raise ValueError("Telefone inválido")
         return digits
