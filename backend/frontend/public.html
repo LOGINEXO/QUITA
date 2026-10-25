@@ -122,7 +122,6 @@ form.addEventListener('submit',e=>{
  setStatus('Carregando modelo 3D…');
  const threeUrl='https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
  const canvas=document.getElementById('car-3d'); if(!canvas)return;
- const threeUrl='https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
  import(threeUrl).then(THREE=>{
   const scene=new THREE.Scene(); scene.background=null;
   const camera=new THREE.PerspectiveCamera(34,1,.1,100); camera.position.set(5.9,3.25,7.2); camera.lookAt(0,.55,0);
