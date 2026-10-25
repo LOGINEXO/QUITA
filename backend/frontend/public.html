@@ -140,7 +140,7 @@ form.addEventListener('submit',e=>{
   const alloy=new THREE.MeshStandardMaterial({color:0x9ac6d0,metalness:.92,roughness:.22});
   const led=new THREE.MeshStandardMaterial({color:0x8cfff8,emissive:0x20dfe9,emissiveIntensity:3});
   const red=new THREE.MeshStandardMaterial({color:0xff244f,emissive:0xff143c,emissiveIntensity:2});
-  function part(geo,mat,pos,opts={}){const g=new THREE.Group();g.position.set(...pos);const m=new THREE.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;g.add(m);car.add(g);parts.push({g,base:g.position.clone(),rot:g.rotation.clone(),explode:new THREE.Vector3(...(opts.explode||[0,0,0]))});return g}
+  function part(geo,mat,pos,opts={}){const g=new THREE.Group();g.position.set(...pos);const m=new THREE.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;g.add(m);car.add(g);const i=parts.length;const spread=opts.explode||[(pos[0]<0?-1:1)*(.55+Math.abs(pos[0])*.35),.45+(i%4)*.16,(pos[2]<0?-1:1)*(.8+Math.abs(pos[2])*.55)];parts.push({g,base:g.position.clone(),rot:g.rotation.clone(),explode:new THREE.Vector3(...spread)});return g}
   function box(w,h,d,mat,pos,bevel=0){const geo=new THREE.BoxGeometry(w,h,d);return part(geo,mat,pos)}
   function shape(points,depth,mat,pos){const sh=new THREE.Shape();points.forEach((p,i)=>i?sh.lineTo(p[0],p[1]):sh.moveTo(p[0],p[1]));sh.closePath();const geo=new THREE.ExtrudeGeometry(sh,{depth,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.045,bevelThickness:.035});geo.translate(-depth/2,0,0);return part(geo,mat,pos)}
   // Chassis and sculpted body panels
