@@ -84,32 +84,58 @@ lookupForm.addEventListener('submit',async e=>{
 const form=document.getElementById('client-form');
 const plate=document.getElementById('plate');
 plate.addEventListener('input',()=>plate.value=plate.value.toUpperCase().replace(/[^A-Z0-9]/g,''));
-form.addEventListener('submit',e=>{
+const formStatus=document.createElement('p');
+formStatus.className='privacy';
+formStatus.id='client-form-status';
+formStatus.setAttribute('role','status');
+formStatus.setAttribute('aria-live','polite');
+form.appendChild(formStatus);
+form.addEventListener('submit',async e=>{
  e.preventDefault();
  if(!form.reportValidity())return;
  const fd=new FormData(form);
- const lines=['Olá! Gostaria de solicitar uma análise do meu financiamento pelo site QUITA.','', 'DADOS DO CLIENTE'];
- for(const [key,value] of fd.entries()){
-   if(key==='on'||!String(value).trim())continue;
-   if(['Nome completo','Telefone/WhatsApp','E-mail','CPF/CNPJ','Cidade/Estado'].includes(key))lines.push(key+': '+String(value).trim());
+ const get=name=>String(fd.get(name)||'').trim();
+ const phoneDigits=get('Telefone/WhatsApp').replace(/\\D/g,'');
+ const submit=form.querySelector('button[type="submit"]');
+ submit.disabled=true; submit.textContent='Registrando solicitação...';
+ formStatus.textContent='Registrando seu contato com segurança antes de abrir o WhatsApp...';
+ try{
+   const leadPayload={
+     full_name:get('Nome completo'),
+     phone:phoneDigits,
+     email:get('E-mail')||null,
+     postal_code:null,
+     source:'site_publico',
+     privacy_consent:document.getElementById('consent').checked
+   };
+   const leadResponse=await fetch('/leads',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(leadPayload)});
+   const leadData=await leadResponse.json().catch(()=>({}));
+   if(!leadResponse.ok)throw new Error(typeof leadData.detail==='string'?leadData.detail:'Não foi possível registrar sua solicitação. Confira o telefone e tente novamente.');
+   const vehiclePlate=get('Placa').toUpperCase().replace(/[^A-Z0-9]/g,'');
+   if(/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(vehiclePlate)){
+     try{
+       await fetch('/consultations/vehicle',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({plate:vehiclePlate,lead_id:leadData.id})});
+     }catch(consultError){console.warn('Consulta veicular não concluída; lead foi registrado.',consultError);}
+   }
+   const lines=['Olá! Gostaria de solicitar uma análise do meu financiamento pelo site QUITA.','', 'PROTOCOLO DE ATENDIMENTO: '+leadData.id,'', 'DADOS DO CLIENTE'];
+   for(const key of ['Nome completo','Telefone/WhatsApp','E-mail','CPF/CNPJ','Cidade/Estado']){
+     const value=get(key);if(value)lines.push(key+': '+value);
+   }
+   lines.push('', 'DADOS DO VEÍCULO');
+   for(const key of ['Placa','Marca e modelo','Ano do veículo']){const value=get(key);if(value)lines.push(key+': '+value);}
+   lines.push('', 'FINANCIAMENTO E PARCELAS');
+   for(const key of ['Banco/Financeira','Número do contrato','Valor da parcela','Parcelas em atraso','Atraso desde','Saldo devedor aproximado','Notificações']){const value=get(key);if(value)lines.push(key+': '+value);}
+   lines.push('', 'ATENDIMENTO');
+   for(const key of ['Descrição da situação','Objetivo do atendimento']){const value=get(key);if(value)lines.push(key+': '+value);}
+   lines.push('', 'Enviei estas informações para dar início ao atendimento. Por favor, orientem-me sobre os próximos passos.');
+   formStatus.textContent='Solicitação registrada. Abrindo o WhatsApp para você revisar e enviar a mensagem.';
+   const url='https://wa.me/?text='+encodeURIComponent(lines.join('\\n'));
+   window.location.href=url;
+ }catch(err){
+   formStatus.textContent=err.message||'Não foi possível registrar sua solicitação. Tente novamente.';
+   submit.disabled=false;submit.textContent='Revisar solicitação no WhatsApp ↗';
  }
- lines.push('', 'DADOS DO VEÍCULO');
- for(const [key,value] of fd.entries()){
-   if(['Placa','Marca e modelo','Ano do veículo'].includes(key)&&String(value).trim())lines.push(key+': '+String(value).trim());
- }
- lines.push('', 'FINANCIAMENTO E PARCELAS');
- for(const [key,value] of fd.entries()){
-   if(['Banco/Financeira','Número do contrato','Valor da parcela','Parcelas em atraso','Atraso desde','Saldo devedor aproximado','Notificações'].includes(key)&&String(value).trim())lines.push(key+': '+String(value).trim());
- }
- lines.push('', 'ATENDIMENTO');
- for(const [key,value] of fd.entries()){
-   if(['Descrição da situação','Objetivo do atendimento'].includes(key)&&String(value).trim())lines.push(key+': '+String(value).trim());
- }
- lines.push('', 'Enviei estas informações para dar início ao atendimento. Por favor, orientem-me sobre os próximos passos.');
- const url='https://wa.me/?text='+encodeURIComponent(lines.join('\n'));
- window.location.href=url;
-});
-</script>
+});</script>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
 </script>
