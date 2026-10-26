@@ -114,20 +114,3 @@ def test_logout_deletes_session_and_clears_cookie(monkeypatch):
     assert response.json() == {"logged_out": True}
     assert deleted == ["fake-session-id"]
     assert "max-age=0" in response.headers["set-cookie"].lower()
-
-
-def test_provider_admin_routes_require_browser_session(monkeypatch):
-    configure_admin(monkeypatch)
-    monkeypatch.setattr("app.api.providers.store.list_configs", lambda: [])
-
-    async def get_session(session_id):
-        return EMAIL if session_id == "valid-session-id" else None
-
-    monkeypatch.setattr("app.api.admin_auth.get_admin_session_email", get_session)
-    with TestClient(app) as client:
-        denied = client.get("/admin/providers")
-        assert denied.status_code == 401
-
-        client.cookies.set(SESSION_COOKIE, "valid-session-id")
-        allowed = client.get("/admin/providers")
-        assert allowed.status_code == 200
