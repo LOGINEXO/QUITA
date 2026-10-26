@@ -65,21 +65,46 @@ const lookupPlate=document.getElementById('lookup-plate');
 const lookupStatus=document.getElementById('plate-status');
 const lookupResult=document.getElementById('plate-result');
 lookupPlate.addEventListener('input',()=>lookupPlate.value=lookupPlate.value.toUpperCase().replace(/[^A-Z0-9]/g,''));
-lookupForm.addEventListener('submit',async e=>{
+lookupForm.addEventListener('submit',e=>{
  e.preventDefault();
- const value=lookupPlate.value.trim();
- lookupStatus.textContent='Consultando a base veicular...';
- lookupResult.classList.add('hidden'); lookupResult.textContent='';
- const button=lookupForm.querySelector('button'); button.disabled=true; button.textContent='Consultando...';
- try{
-  const response=await fetch('/consultations/vehicle',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({plate:value})});
-  const data=await response.json();
-  if(!response.ok) throw new Error(typeof data.detail==='string'?data.detail:(data.detail?.message||'Não foi possível concluir a consulta agora.'));
-  lookupResult.textContent=JSON.stringify(data.data??data,null,2);
-  lookupResult.classList.remove('hidden');
-  lookupStatus.textContent=data.status==='success'?'Consulta concluída e registrada. Confira os dados retornados; confirme débitos e restrições nos canais oficiais.':'A consulta foi registrada, mas a fonte está indisponível no momento. Isso não significa ausência de débitos ou restrições.';
- }catch(err){lookupStatus.textContent=err.message||'Consulta indisponível no momento. Tente novamente mais tarde.';}
- finally{button.disabled=false;button.textContent='Consultar placa ↗';}
+ const value=lookupPlate.value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+ if(!/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(value)){
+   lookupStatus.textContent='Confira a placa digitada e tente novamente.';
+   lookupPlate.focus(); return;
+ }
+ // A consulta particular é manual: não chamamos API paga nem simulamos resultado.
+ plate.value=value;
+ lookupStatus.textContent='Placa preenchida. Complete o formulário abaixo; se não souber algum dado, marque “Não sei essa informação”.';
+ document.getElementById('solicitacao').scrollIntoView({behavior:'smooth',block:'start'});
+ document.getElementById('full_name').focus({preventScroll:true});
+});
+// Campos opcionais: o cliente pode registrar explicitamente que não sabe a informação.
+document.querySelectorAll('#client-form .field').forEach(field=>{
+ const control=field.querySelector('input:not([type="checkbox"]), select, textarea');
+ if(!control || control.required) return;
+ const label=field.querySelector('label');
+ if(!label) return;
+ const button=document.createElement('button');
+ button.type='button';
+ button.textContent='Não sei essa informação';
+ button.setAttribute('aria-pressed','false');
+ button.style.cssText='margin-top:7px;border:1px solid #34435b;border-radius:7px;padding:7px 10px;background:#101a2a;color:#aab9d0;font:11px DM Sans,sans-serif;cursor:pointer';
+ button.addEventListener('click',()=>{
+   const selected=button.getAttribute('aria-pressed')!=='true';
+   button.setAttribute('aria-pressed',String(selected));
+   button.textContent=selected?'Marcar que não sei ✓':'Não sei essa informação';
+   button.style.borderColor=selected?'#6ce6e1':'#34435b';
+   button.style.color=selected?'#6ce6e1':'#aab9d0';
+   if(control.tagName==='SELECT'){
+     let option=[...control.options].find(o=>o.value==='__unknown__');
+     if(!option){option=new Option('Não sei informar','__unknown__');control.add(option);}
+     control.value=selected?'__unknown__':'';
+   }else{
+     control.value=selected?'Não sei informar':'';
+     control.readOnly=selected;
+   }
+ });
+ field.appendChild(button);
 });
 const form=document.getElementById('client-form');
 const plate=document.getElementById('plate');
@@ -106,7 +131,8 @@ form.addEventListener('submit',async e=>{
      email:get('E-mail')||null,
      postal_code:null,
      source:'site_publico',
-     privacy_consent:document.getElementById('consent').checked
+     privacy_consent:document.getElementById('consent').checked,
+     details:Object.fromEntries([...fd.entries()].filter(([key])=>!['Nome completo','Telefone/WhatsApp','E-mail'].includes(key)).map(([key,value])=>[key,String(value).trim()]))
    };
    const leadResponse=await fetch('/leads',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(leadPayload)});
    const leadData=await leadResponse.json().catch(()=>({}));
