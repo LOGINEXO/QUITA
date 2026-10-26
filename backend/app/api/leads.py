@@ -159,6 +159,66 @@ def list_leads(
     ]
 
 
+@router.post(
+    "/admin/leads/{lead_id}/convert",
+    response_model=LeadAdminView,
+    dependencies=[Depends(require_admin_session)],
+)
+def convert_lead(lead_id: int, db: Session = Depends(get_db)) -> LeadAdminView:
+    """Converte a captação no cadastro de cliente já vinculado, sem criar duplicatas."""
+    lead = db.get(Lead, lead_id)
+    if lead is None:
+        raise HTTPException(status_code=404, detail="Lead não encontrado")
+    customer = db.get(Customer, lead.customer_id)
+    if customer is None:
+        raise HTTPException(status_code=409, detail="Cliente vinculado ao lead não encontrado")
+
+    # A captação já cria o registro de Customer. Reutilizamos esse registro e
+    # preservamos todos os dados previamente salvos na ficha.
+    details: dict[str, object] = {}
+    if lead.notes:
+        try:
+            parsed = json.loads(lead.notes)
+            if isinstance(parsed, dict):
+                details = parsed
+        except (TypeError, ValueError):
+            details = {"notes": lead.notes}
+
+    address = dict(customer.address_json or {})
+    if details:
+        prior = address.get("lead_details")
+        merged = dict(prior) if isinstance(prior, dict) else {}
+        merged.update(details)
+        address["lead_details"] = merged
+        customer.address_json = address
+
+    already_converted = lead.status == "converted"
+    lead.status = "converted"
+    if not already_converted:
+        db.add(AuditEvent(
+            actor_id="admin",
+            action="lead.converted",
+            resource_type="lead",
+            resource_id=str(lead.id),
+            details_json={"customer_id": customer.id, "details_preserved": bool(details)},
+        ))
+    db.commit()
+    db.refresh(lead)
+    db.refresh(customer)
+    return LeadAdminView(
+        id=lead.id,
+        customer_id=lead.customer_id,
+        source=lead.source,
+        status=lead.status,
+        notes=lead.notes,
+        created_at=lead.created_at,
+        updated_at=lead.updated_at,
+        customer_name=customer.full_name,
+        customer_email=customer.email,
+        customer_phone=customer.phone,
+    )
+
+
 @router.patch(
     "/admin/leads/{lead_id}",
     response_model=LeadAdminView,
