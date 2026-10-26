@@ -96,9 +96,9 @@ document.querySelectorAll('#client-form .field').forEach(field=>{
    button.style.borderColor=selected?'#6ce6e1':'#34435b';
    button.style.color=selected?'#6ce6e1':'#aab9d0';
    if(control.tagName==='SELECT'){
-     let option=[...control.options].find(o=>o.value==='__unknown__');
-     if(!option){option=new Option('Não sei informar','__unknown__');control.add(option);}
-     control.value=selected?'__unknown__':'';
+     let option=[...control.options].find(o=>o.value==='Não sei informar');
+     if(!option){option=new Option('Não sei informar','Não sei informar');control.add(option);}
+     control.value=selected?'Não sei informar':'';
    }else{
      control.value=selected?'Não sei informar':'';
      control.readOnly=selected;
