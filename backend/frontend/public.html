@@ -153,7 +153,7 @@ form.addEventListener('submit',async e=>{
    for(const key of ['Objetivo do atendimento']){const value=get(key);if(value)lines.push(key+': '+value);}
    lines.push('', 'Enviei estas informações para dar início ao atendimento. Por favor, orientem-me sobre os próximos passos.');
    formStatus.textContent='Solicitação registrada. Abrindo o WhatsApp para você revisar e enviar a mensagem.';
-   const url='https://wa.me/?text='+encodeURIComponent(lines.join('\n'));
+   const url='https://wa.me/559128880882?text='+encodeURIComponent(lines.join('\n'));
    window.location.href=url;
  }catch(err){
    formStatus.textContent=err.message||'Não foi possível registrar sua solicitação. Tente novamente.';
