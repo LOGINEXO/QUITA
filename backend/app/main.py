@@ -14,6 +14,21 @@ from app.db.health import router as database_health_router
 
 app = FastAPI(title="QUITA API", version="0.8.0", description="QUITA para captação e gestão manual de solicitações.")
 app.add_middleware(InMemoryRateLimitMiddleware)
+
+
+@app.middleware("http")
+async def production_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    if request.url.scheme == "https":
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    if request.url.path.startswith(("/admin", "/auth/admin", "/admin/customers", "/admin/leads")):
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Pragma"] = "no-cache"
+    return response
 app.include_router(admin_auth_router)
 app.include_router(customers_router)
 app.include_router(leads_router)
