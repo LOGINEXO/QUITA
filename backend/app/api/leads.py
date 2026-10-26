@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from datetime import datetime
 
@@ -22,6 +23,7 @@ class LeadCreateRequest(BaseModel):
     postal_code: str | None = Field(default=None, max_length=12)
     source: str | None = Field(default="site", max_length=80)
     privacy_consent: bool
+    details: dict[str, str] = Field(default_factory=dict)
 
     @field_validator("full_name")
     @classmethod
@@ -107,7 +109,7 @@ def create_lead(payload: LeadCreateRequest, db: Session = Depends(get_db)) -> Le
     )
     db.add(customer)
     db.flush()
-    lead = Lead(customer_id=customer.id, source=payload.source, status="new")
+    safe_details = {str(k)[:100]: str(v)[:2000] for k, v in (payload.details or {}).items() if str(v).strip()}\n    lead = Lead(customer_id=customer.id, source=payload.source, status="new", notes=json.dumps(safe_details, ensure_ascii=False) if safe_details else None)
     db.add(lead)
     db.flush()
     db.add(
