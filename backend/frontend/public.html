@@ -20,17 +20,10 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important}}
 </style></head>
 <body><div class="ambient a"></div><div class="ambient b"></div><div class="wrap">
-<header class="nav"><div class="brand"><span class="mark"><i></i><i></i><i></i></span> QUITA</div><a class="nav-action" href="#consulta-placa">Consultar placa ↗</a></header>
+<header class="nav"><div class="brand"><span class="mark"><i></i><i></i><i></i></span> QUITA</div><a class="nav-action" href="#solicitacao">Solicitar análise ↗</a></header>
 <main>
 <section class="hero"><div class="hero-copy"><div class="eyebrow"><span class="pulse"></span> ANÁLISE DE FINANCIAMENTO</div><h1>Seu próximo passo começa com <em>clareza.</em></h1><p>Preencha os dados abaixo para solicitar uma análise do seu financiamento veicular. Ao concluir, suas respostas serão organizadas em uma mensagem para continuar o atendimento pelo WhatsApp.</p><div class="trust"><span class="pulse"></span><span><b>Atendimento organizado</b> · Você revisa a mensagem antes de enviar</span></div></div>
 <div class="scene" aria-label="Ilustração tridimensional de um veículo em movimento"><div class="scene-road"></div><span class="speed-line one"></span><span class="speed-line two"></span><div class="car-3d-wrap"><canvas id="car-3d" aria-label="Carro 3D interativo, gire arrastando o mouse"></canvas><div class="car-controls"><button type="button" id="car-assemble">Montar</button><button type="button" id="car-explode">Desmontar</button><button type="button" id="car-spin" aria-pressed="true">360°: ligado</button></div><div class="car-hint">ARRASTE PARA GIRAR · MODELO 3D INTERATIVO</div></div></div></section>
-<section id="consulta-placa" style="margin:8px 0 48px">
-<div class="section-head"><div class="eyebrow"><span class="pulse"></span> CONSULTA VEICULAR</div><h2>Seu veículo está com dívidas? Descubra como dar o primeiro passo para quitá-las!</h2><p>Consulte a placa, identifique possíveis débitos e encontre o caminho para regularizar seu veículo. <strong>Chega de deixar as pendências acumularem: comece hoje a buscar a tranquilidade de ter seu veículo em dia!</strong> Os dados dependem da disponibilidade da fonte consultada; confirme valores e pendências nos canais oficiais.</p></div>
-<div class="form-card"><form id="plate-form" class="form-grid">
-<div class="field"><label for="lookup-plate">Placa do veículo</label><input id="lookup-plate" name="plate" maxlength="10" autocapitalize="characters" required placeholder="ABC1D23 ou ABC1234"></div>
-<button class="submit" type="submit">Consultar placa ↗</button>
-</form><p id="plate-status" class="privacy" role="status" aria-live="polite"></p><pre id="plate-result" class="hidden" style="white-space:pre-wrap;overflow-wrap:anywhere;background:#090f1b;border:1px solid #293348;border-radius:10px;padding:16px;color:#dbe8f8;font:12px/1.7 monospace;max-height:420px;overflow:auto"></pre></div>
-</section>
 <section id="solicitacao"><div class="section-head"><div class="eyebrow"><span class="pulse"></span> FORMULÁRIO DE ATENDIMENTO</div><h2>Conte-nos sobre seu financiamento</h2><p>Preencha o que souber. Os campos marcados com * são obrigatórios; informações que você não tiver podem ser esclarecidas durante o atendimento.</p></div>
 <div class="form-card"><form id="client-form" class="form-grid">
 <div class="group-title"><span>01</span> Seus dados</div>
@@ -58,24 +51,6 @@
 </main><footer class="foot"><span>© 2026 QUITA · Atendimento veicular</span><span>Grandes mudanças começam com uma decisão. Dê o primeiro passo hoje.</span></footer>
 </div>
 <script>
-const lookupForm=document.getElementById('plate-form');
-const lookupPlate=document.getElementById('lookup-plate');
-const lookupStatus=document.getElementById('plate-status');
-const lookupResult=document.getElementById('plate-result');
-lookupPlate.addEventListener('input',()=>lookupPlate.value=lookupPlate.value.toUpperCase().replace(/[^A-Z0-9]/g,''));
-lookupForm.addEventListener('submit',e=>{
- e.preventDefault();
- const value=lookupPlate.value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
- if(!/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(value)){
-   lookupStatus.textContent='Confira a placa digitada e tente novamente.';
-   lookupPlate.focus(); return;
- }
- // A consulta particular é manual: não chamamos API paga nem simulamos resultado.
- plate.value=value;
- lookupStatus.textContent='Placa preenchida. Complete o formulário abaixo; se não souber algum dado, marque “Não sei essa informação”.';
- document.getElementById('solicitacao').scrollIntoView({behavior:'smooth',block:'start'});
- document.getElementById('full_name').focus({preventScroll:true});
-});
 // Campos opcionais: o cliente pode registrar explicitamente que não sabe a informação.
 document.querySelectorAll('#client-form .field').forEach(field=>{
  const control=field.querySelector('input:not([type="checkbox"]), select, textarea');
@@ -135,12 +110,6 @@ form.addEventListener('submit',async e=>{
    const leadResponse=await fetch('/leads',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(leadPayload)});
    const leadData=await leadResponse.json().catch(()=>({}));
    if(!leadResponse.ok)throw new Error(typeof leadData.detail==='string'?leadData.detail:'Não foi possível registrar sua solicitação. Confira o telefone e tente novamente.');
-   const vehiclePlate=get('Placa').toUpperCase().replace(/[^A-Z0-9]/g,'');
-   if(/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(vehiclePlate)){
-     try{
-       await fetch('/consultations/vehicle',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({plate:vehiclePlate,lead_id:leadData.id})});
-     }catch(consultError){console.warn('Consulta veicular não concluída; lead foi registrado.',consultError);}
-   }
    const lines=['Olá! Gostaria de solicitar uma análise do meu financiamento pelo site QUITA.','', 'PROTOCOLO DE ATENDIMENTO: '+leadData.id,'', 'DADOS DO CLIENTE'];
    for(const key of ['Nome completo','Telefone/WhatsApp','E-mail','CPF/CNPJ','Cidade/Estado']){
      const value=get(key);if(value)lines.push(key+': '+value);
