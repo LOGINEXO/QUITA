@@ -72,12 +72,12 @@ lookupForm.addEventListener('submit',async e=>{
  lookupResult.classList.add('hidden'); lookupResult.textContent='';
  const button=lookupForm.querySelector('button'); button.disabled=true; button.textContent='Consultando...';
  try{
-  const response=await fetch('/integrations/buscafipe/placa',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({placa:value})});
+  const response=await fetch('/consultations/vehicle',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({plate:value})});
   const data=await response.json();
   if(!response.ok) throw new Error(typeof data.detail==='string'?data.detail:(data.detail?.message||'Não foi possível concluir a consulta agora.'));
   lookupResult.textContent=JSON.stringify(data.data??data,null,2);
   lookupResult.classList.remove('hidden');
-  lookupStatus.textContent='Consulta concluída. Confira os dados retornados. A fonte pode não disponibilizar débitos ou restrições para esta placa.';
+  lookupStatus.textContent=data.status==='success'?'Consulta concluída e registrada. Confira os dados retornados; confirme débitos e restrições nos canais oficiais.':'A consulta foi registrada, mas a fonte está indisponível no momento. Isso não significa ausência de débitos ou restrições.';
  }catch(err){lookupStatus.textContent=err.message||'Consulta indisponível no momento. Tente novamente mais tarde.';}
  finally{button.disabled=false;button.textContent='Consultar placa ↗';}
 });
