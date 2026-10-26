@@ -109,7 +109,8 @@ def create_lead(payload: LeadCreateRequest, db: Session = Depends(get_db)) -> Le
     )
     db.add(customer)
     db.flush()
-    safe_details = {str(k)[:100]: str(v)[:2000] for k, v in (payload.details or {}).items() if str(v).strip()}\n    lead = Lead(customer_id=customer.id, source=payload.source, status="new", notes=json.dumps(safe_details, ensure_ascii=False) if safe_details else None)
+    safe_details = {str(k)[:100]: str(v)[:2000] for k, v in (payload.details or {}).items() if str(v).strip()}
+    lead = Lead(customer_id=customer.id, source=payload.source, status="new", notes=json.dumps(safe_details, ensure_ascii=False) if safe_details else None)
     db.add(lead)
     db.flush()
     db.add(
