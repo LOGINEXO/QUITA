@@ -52,6 +52,36 @@
 </main><footer class="foot"><span>© 2026 QUITA · Atendimento veicular</span><span>Grandes mudanças começam com uma decisão. Dê o primeiro passo hoje.</span></footer>
 </div>
 <script>
+// Animação tipográfica de leitura, ativada conforme cada frase entra na tela.
+const textMotionStyle=document.createElement('style');
+textMotionStyle.textContent=`
+.motion-copy{--reveal-delay:0ms}
+.motion-copy .word{display:inline-block;opacity:1;transform:none;filter:none}
+body.motion-ready .motion-copy .word{opacity:0;transform:translate3d(0,.42em,0);filter:blur(5px);transition:opacity .62s cubic-bezier(.2,.7,.2,1),transform .72s cubic-bezier(.2,.7,.2,1),filter .72s cubic-bezier(.2,.7,.2,1);transition-delay:var(--word-delay,0ms)}
+body.motion-ready .motion-copy.is-visible .word{opacity:1;transform:translate3d(0,0,0);filter:blur(0)}
+.motion-copy .word-space{white-space:pre}
+@media(prefers-reduced-motion:reduce){body.motion-ready .motion-copy .word{opacity:1;transform:none;filter:none;transition:none}}
+`;
+document.head.appendChild(textMotionStyle);
+document.querySelectorAll('.hero h1,.hero-copy p,.trust,.section-head h2,.section-head p,.group-title,.field label,.privacy,.foot span').forEach(el=>{
+ if(el.closest('button')||el.querySelector('input,select,textarea,button')||el.dataset.textMotion==='done')return;
+ el.dataset.textMotion='done';el.classList.add('motion-copy');
+ const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
+ const nodes=[];while(walker.nextNode())if(walker.currentNode.nodeValue.trim())nodes.push(walker.currentNode);
+ nodes.forEach(node=>{
+  const fragment=document.createDocumentFragment();
+  const chunks=node.nodeValue.split(/(\\s+)/);
+  let wordIndex=0;
+  chunks.forEach(chunk=>{
+   if(!chunk)return;
+   if(/^\\s+$/.test(chunk)){fragment.appendChild(document.createTextNode(chunk));return}
+   const span=document.createElement('span');span.className='word';span.textContent=chunk;
+   span.style.setProperty('--word-delay',Math.min(wordIndex*38,420)+'ms');wordIndex++;
+   fragment.appendChild(span);
+  });
+  node.parentNode.replaceChild(fragment,node);
+ });
+});
 // Animações progressivas sem dependência externa, respeitando movimento reduzido.
 document.body.classList.add("motion-ready");
 const motionTargets=document.querySelectorAll(".hero-copy,.scene,.section-head,.form-card,.foot");
