@@ -63,7 +63,7 @@
 <div class="story-art" aria-hidden="true"><div class="story-orbit"></div><div class="story-glyph" id="story-glyph"><svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 69L29 48C31 43 35 40 41 39L77 34C83 33 88 36 92 41L103 59L108 64V80H13V73C13 71 16 69 20 69Z" stroke="#6ce6e1" stroke-width="2.5" stroke-linejoin="round"/><path d="M30 49L84 43L94 60H24L30 49Z" stroke="#6ce6e1" stroke-width="2" stroke-linejoin="round"/><path d="M14 68H29M94 68H108" stroke="#6ce6e1" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="80" r="9" fill="#0b1424" stroke="#6ce6e1" stroke-width="2.5"/><circle cx="88" cy="80" r="9" fill="#0b1424" stroke="#6ce6e1" stroke-width="2.5"/><path d="M42 91H78" stroke="#6ce6e1" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/></svg><span class="glyph-number" id="story-glyph-number">CLAREZA</span></div></div>
 <div class="story-scroll-hint">CONTINUE ROLANDO</div>
 <div class="story-progress"><span class="story-progress-label" id="story-progress-label">01 — 03</span><div class="story-progress-track"><div class="story-progress-fill" id="story-progress-fill"></div></div><span class="story-progress-label">QUITA / PRÓXIMO PASSO</span></div>
-</div></section>\n<section id="solicitacao"><div class="section-head"><div class="eyebrow"><span class="pulse"></span> FORMULÁRIO DE ATENDIMENTO</div><h2>Conte-nos sobre seu financiamento</h2><p>Preencha o que souber. Os campos marcados com * são obrigatórios; informações que você não tiver podem ser esclarecidas durante o atendimento.</p></div>
+</div></section><section id="solicitacao"><div class="section-head"><div class="eyebrow"><span class="pulse"></span> FORMULÁRIO DE ATENDIMENTO</div><h2>Conte-nos sobre seu financiamento</h2><p>Preencha o que souber. Os campos marcados com * são obrigatórios; informações que você não tiver podem ser esclarecidas durante o atendimento.</p></div>
 <div class="form-card"><form id="client-form" class="form-grid">
 <div class="group-title"><span>01</span> Seus dados</div>
 <div class="field"><label for="full_name">Nome completo *</label><input id="full_name" name="Nome completo" autocomplete="name" required maxlength="180" placeholder="Como podemos chamar você?"></div>
@@ -130,12 +130,6 @@
  render();
 })();
 \n
-// Remove any accidental literal "\\n" left between HTML sections.
-document.querySelectorAll('body *').forEach(el=>{
-  for(const node of [...el.childNodes]){
-    if(node.nodeType===Node.TEXT_NODE && /^\\\\n+$/.test(node.nodeValue.trim())) node.remove();
-  }
-});
 \n// Tipografia realmente vinculada ao scroll: cada palavra acompanha a posição da rolagem.
 const textMotionStyle=document.createElement('style');
 textMotionStyle.textContent=`
