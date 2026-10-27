@@ -129,6 +129,13 @@
  window.addEventListener('resize',request,{passive:true});
  render();
 })();
+\n
+// Remove any accidental literal "\\n" left between HTML sections.
+document.querySelectorAll('body *').forEach(el=>{
+  for(const node of [...el.childNodes]){
+    if(node.nodeType===Node.TEXT_NODE && /^\\\\n+$/.test(node.nodeValue.trim())) node.remove();
+  }
+});
 \n// Tipografia realmente vinculada ao scroll: cada palavra acompanha a posição da rolagem.
 const textMotionStyle=document.createElement('style');
 textMotionStyle.textContent=`
