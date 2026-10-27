@@ -52,6 +52,14 @@
 </main><footer class="foot"><span>© 2026 QUITA · Atendimento veicular</span><span>Grandes mudanças começam com uma decisão. Dê o primeiro passo hoje.</span></footer>
 </div>
 <script>
+// Animações progressivas sem dependência externa, respeitando movimento reduzido.
+document.body.classList.add("motion-ready");
+const motionTargets=document.querySelectorAll(".hero-copy,.scene,.section-head,.form-card,.foot");
+if("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches){
+ motionTargets.forEach(el=>el.classList.add("motion-in"));
+ const motionObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("is-visible");motionObserver.unobserve(entry.target)}}),{threshold:.12,rootMargin:"0px 0px -36px 0px"});
+ motionTargets.forEach(el=>motionObserver.observe(el));
+}else{motionTargets.forEach(el=>el.classList.add("is-visible"));}
 // Campos opcionais: o cliente pode registrar explicitamente que não sabe a informação.
 document.querySelectorAll('#client-form .field').forEach(field=>{
  const control=field.querySelector('input:not([type="checkbox"]), select, textarea');
