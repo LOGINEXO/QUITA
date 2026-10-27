@@ -144,8 +144,10 @@
  window.addEventListener('resize',request,{passive:true});
  render();
 })();
-\n
-\n// Tipografia realmente vinculada ao scroll: cada palavra acompanha a posição da rolagem.
+
+
+
+// Tipografia realmente vinculada ao scroll: cada palavra acompanha a posição da rolagem.
 const textMotionStyle=document.createElement('style');
 textMotionStyle.textContent=`
 .motion-copy .word{display:inline-block;will-change:opacity,transform,filter}
@@ -270,7 +272,8 @@ form.addEventListener('submit',async e=>{
    for(const key of ['Objetivo do atendimento']){const value=get(key);if(value)lines.push(key+': '+value);}
    lines.push('', 'Enviei estas informações para dar início ao atendimento. Por favor, orientem-me sobre os próximos passos.');
    formStatus.textContent='Solicitação registrada. Abrindo o WhatsApp para você revisar e enviar a mensagem.';
-   const url='https://wa.me/559128880882?text='+encodeURIComponent(lines.join('\n'));
+   const url='https://wa.me/559128880882?text='+encodeURIComponent(lines.join('
+'));
    window.location.href=url;
  }catch(err){
    formStatus.textContent=err.message||'Não foi possível registrar sua solicitação. Tente novamente.';
