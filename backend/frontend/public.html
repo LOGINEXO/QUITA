@@ -18,12 +18,14 @@
 .form-card{background:linear-gradient(145deg,rgba(20,31,51,.94),rgba(10,15,27,.96));border:1px solid #ffffff16;border-radius:20px;padding:clamp(20px,3.5vw,34px);box-shadow:0 24px 80px #0005;margin-bottom:52px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.group-title{grid-column:1/-1;display:flex;align-items:center;gap:11px;padding-top:9px;margin-top:5px;border-top:1px solid var(--line);font:700 13px Manrope,sans-serif;color:#e9f1fc}.group-title:first-child{border-top:0;padding-top:0;margin-top:0}.group-title span{display:grid;place-items:center;width:28px;height:28px;border:1px solid #6ce6e13b;background:#6ce6e10c;color:var(--cyan);border-radius:8px;font-size:12px}.field{min-width:0}.field.full{grid-column:1/-1}.field label{display:block;color:#cbd5e5;font-size:11px;font-weight:600;margin-bottom:8px}.field input,.field select,.field textarea{width:100%;min-height:47px;border:1px solid #293348;background:#090f1b;color:#f5f7fc;border-radius:9px;padding:12px 13px;font:13px "DM Sans",sans-serif;outline:none;transition:border .2s,box-shadow .2s}.field textarea{resize:vertical;min-height:85px}.field input:focus,.field select:focus,.field textarea:focus{border-color:#5bd6d1;box-shadow:0 0 0 3px #6ce6e10e}.field input::placeholder,.field textarea::placeholder{color:#56627a}.hint{font-size:10px;color:#73819a;line-height:1.6;margin-top:6px}.consent{grid-column:1/-1;display:flex;gap:10px;align-items:flex-start;color:#9daac0;font-size:11px;line-height:1.7}.consent input{margin-top:3px;accent-color:#6ce6e1}.submit{grid-column:1/-1;border:0;border-radius:10px;min-height:54px;background:linear-gradient(100deg,#8cf0e4,#65d5d8 54%,#79c8e8);color:#07121c;font:800 13px "DM Sans",sans-serif;cursor:pointer;box-shadow:0 7px 26px #4acac322;transition:transform .2s,box-shadow .2s}.submit:hover{transform:translateY(-2px);box-shadow:0 12px 32px #4acac344}.privacy{color:#7f8ba3;font-size:10px;line-height:1.7;margin:14px 0 0}.foot{border-top:1px solid var(--line);padding:22px 0 28px;color:#68758d;font-size:10px;display:flex;justify-content:space-between;gap:20px}.hidden{display:none!important}
 @media(max-width:780px){.car-controls{bottom:8px;left:50%;width:calc(100% - 20px);max-width:calc(100% - 20px);gap:6px;justify-content:center;flex-wrap:wrap;white-space:normal}.car-controls button{padding:8px 9px;font-size:10px;flex:0 0 auto}.car-hint{font-size:8px;top:8px}.scene{height:360px;min-height:360px;overflow:hidden;display:block;margin-top:10px;margin-bottom:24px;padding-bottom:0}.car-3d-wrap{position:absolute;inset:0;width:100%;height:100%;min-height:0}.car-3d-wrap #car-3d{position:absolute;inset:0;width:100%;height:100%;min-height:0}.car-controls{bottom:12px}.hero{grid-template-columns:1fr;gap:0;padding:40px 0 20px}.hero-copy{order:1}.hero h1{font-size:clamp(38px,11vw,56px)}.form-grid{grid-template-columns:1fr}.group-title,.field.full,.consent,.submit{grid-column:1}.form-card{padding:20px;margin-bottom:32px}.nav{height:72px}.scene-tag.top{left:1%}.scene-tag.bottom{right:1%}.foot{flex-direction:column;gap:8px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important}}
+
+.scene.scene-photo{display:block;background:#f4f5f7;border:1px solid #ffffff20;box-shadow:0 24px 65px #0005;overflow:hidden;perspective:none}.scene.scene-photo:before{inset:0;background:linear-gradient(180deg,transparent 45%,rgba(5,12,25,.78) 100%);clip-path:none;opacity:1;z-index:1}.scene.scene-photo:after{display:none}.scene-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 42%;filter:saturate(.92);}.scene-photo-caption{position:absolute;z-index:2;left:18px;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;color:#fff;text-shadow:0 2px 12px #0009}.scene-photo-caption span{align-self:flex-start;padding:6px 9px;border-radius:5px;background:#6ce6e1;color:#07121c;font-size:9px;font-weight:800;letter-spacing:.16em}.scene-photo-caption strong{max-width:340px;font:700 clamp(15px,2vw,21px)/1.25 Manrope,sans-serif;letter-spacing:-.025em}@media(max-width:780px){.scene.scene-photo{height:320px;min-height:320px;margin-top:12px;margin-bottom:24px}.scene-photo img{object-position:center 38%}.scene-photo-caption{left:14px;right:14px;bottom:14px}}
 </style></head>
 <body><div class="ambient a"></div><div class="ambient b"></div><div class="wrap">
 <header class="nav"><div class="brand"><span class="mark"><i></i><i></i><i></i></span> QUITA</div><a class="nav-action" href="#solicitacao">Solicitar análise ↗</a></header>
 <main>
 <section class="hero"><div class="hero-copy"><div class="eyebrow"><span class="pulse"></span> ANÁLISE DE FINANCIAMENTO</div><h1>Seu próximo passo começa com <em>clareza.</em></h1><p>Preencha os dados abaixo para solicitar uma análise do seu financiamento veicular. Ao concluir, suas respostas serão organizadas em uma mensagem para continuar o atendimento pelo WhatsApp.</p><div class="trust"><span class="pulse"></span><span><b>Atendimento organizado</b> · Você revisa a mensagem antes de enviar</span></div></div>
-<div class="scene" aria-label="Ilustração tridimensional de um veículo em movimento"><div class="scene-road"></div><span class="speed-line one"></span><span class="speed-line two"></span><div class="car-3d-wrap"><canvas id="car-3d" aria-label="Carro 3D interativo, gire arrastando o mouse"></canvas><div class="car-controls"><button type="button" id="car-assemble">Montar</button><button type="button" id="car-explode">Desmontar</button><button type="button" id="car-spin" aria-pressed="true">360°: ligado</button></div><div class="car-hint">ARRASTE PARA GIRAR · MODELO 3D INTERATIVO</div></div></div></section>
+<div class="scene scene-photo" role="img" aria-label="Consultor com prancheta ao lado de carros populares"><img src="https://bestimportsguatemala.com/wp-content/uploads/2025/07/cuantos-carros-se-puede-importar-al-ano-en-guatemala-4-1024x683.webp" alt="Consultor automotivo com prancheta ao lado de carros convencionais" loading="eager" fetchpriority="high"><div class="scene-photo-caption"><span>QUITA</span><strong>Seu veículo em dia começa com uma boa análise.</strong></div></div></section>
 <section id="solicitacao"><div class="section-head"><div class="eyebrow"><span class="pulse"></span> FORMULÁRIO DE ATENDIMENTO</div><h2>Conte-nos sobre seu financiamento</h2><p>Preencha o que souber. Os campos marcados com * são obrigatórios; informações que você não tiver podem ser esclarecidas durante o atendimento.</p></div>
 <div class="form-card"><form id="client-form" class="form-grid">
 <div class="group-title"><span>01</span> Seus dados</div>
@@ -133,51 +135,4 @@ form.addEventListener('submit',async e=>{
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
 </script>
-<script type="module">
-import * as THREE from 'three';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
-(()=>{
- const canvas=document.getElementById('car-3d'); if(!canvas)return;
- const assemble=document.getElementById('car-assemble'), explode=document.getElementById('car-explode'), spin=document.getElementById('car-spin');
- const status=()=>{let el=document.getElementById('car-status');if(!el){el=document.createElement('div');el.id='car-status';el.className='car-hint';el.style.top='auto';el.style.bottom='48px';canvas.parentElement.appendChild(el)}return el};
- const msg=s=>status().textContent=s;
- const state={exploded:false,spinning:true,ready:false};
- assemble.addEventListener('click',()=>{state.exploded=false;assemble.classList.add('active');explode.classList.remove('active');if(state.ready)msg('Veículo montado');});
- explode.addEventListener('click',()=>{state.exploded=true;explode.classList.add('active');assemble.classList.remove('active');if(state.ready)msg('Visualização de componentes');});
- spin.addEventListener('click',()=>{state.spinning=!state.spinning;spin.textContent='360°: '+(state.spinning?'ligado':'desligado');spin.setAttribute('aria-pressed',String(state.spinning));});
- msg('Carregando carro 3D realista…');
- const scene=new THREE.Scene();
- const camera=new THREE.PerspectiveCamera(34,1,.1,100);camera.position.set(5.4,2.7,6.5);camera.lookAt(0,.6,0);
- const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
- scene.add(new THREE.HemisphereLight(0xeafaff,0x172033,2.1));
- const key=new THREE.DirectionalLight(0xffffff,3.3);key.position.set(4,7,5);scene.add(key);
- const rim=new THREE.DirectionalLight(0x4bdde7,2.4);rim.position.set(-5,3,-4);scene.add(rim);
- const floor=new THREE.Mesh(new THREE.CircleGeometry(2.5,64),new THREE.MeshBasicMaterial({color:0x25dbe5,transparent:true,opacity:.1}));floor.rotation.x=-Math.PI/2;floor.scale.set(1.5,.72,1);floor.position.y=.02;scene.add(floor);
- const root=new THREE.Group();scene.add(root);
- let model=null, parts=[], targetY=.35,targetX=-.05, autoAngle=0,dragging=false,px=0,py=0;
- if(matchMedia('(prefers-reduced-motion: reduce)').matches)state.spinning=false;
- function resize(){const r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}
- new ResizeObserver(resize).observe(canvas);resize();
- canvas.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;canvas.setPointerCapture(e.pointerId)});
- canvas.addEventListener('pointermove',e=>{if(!dragging)return;targetY+=(e.clientX-px)*.012;targetX=Math.max(-.35,Math.min(.35,targetX+(e.clientY-py)*.008));px=e.clientX;py=e.clientY});
- canvas.addEventListener('pointerup',()=>dragging=false);canvas.addEventListener('pointercancel',()=>dragging=false);
- const modelUrl='https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb';
- new GLTFLoader().load(modelUrl,gltf=>{
-   model=gltf.scene;
-   model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;parts.push({object:o,base:o.position.clone(),direction:new THREE.Vector3((Math.random()-.5)*1.5,.35+Math.random()*.7,(Math.random()-.5)*1.5)})}});
-   const box=new THREE.Box3().setFromObject(model), size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
-   model.position.sub(center);
-   const maxDim=Math.max(size.x,size.y,size.z);model.scale.setScalar(3.9/maxDim);
-   // Recenter at ground level after scaling.
-   const b2=new THREE.Box3().setFromObject(model);model.position.y-=b2.min.y;
-   root.add(model);
-   camera.position.set(4.9,2.45,5.9);camera.lookAt(0,.65,0);
-   state.ready=true;assemble.classList.add('active');msg('Modelo 3D carregado · arraste para girar');
- },undefined,err=>{console.error('QUITA GLB load error:',err);msg('Não foi possível carregar o modelo 3D. Verifique a conexão e recarregue.');});
- const clock=new THREE.Clock();
- function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();if(state.spinning&&!dragging)autoAngle+=.004;root.rotation.y+=(targetY+autoAngle-root.rotation.y)*.06;root.rotation.x+=(targetX+Math.sin(t*.6)*.012-root.rotation.x)*.05;root.position.y=Math.sin(t*1.5)*.025;
-  for(const p of parts){const v=state.exploded?p.direction:new THREE.Vector3();p.object.position.x+=(p.base.x+v.x-p.object.position.x)*.065;p.object.position.y+=(p.base.y+v.y-p.object.position.y)*.065;p.object.position.z+=(p.base.z+v.z-p.object.position.z)*.065}
-  renderer.render(scene,camera)}
- animate();
-})();
-</script></body></html>
+</body></html>
